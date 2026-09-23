@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SHANA_DEVELOPER | Pair</title>
+  <!-- Google Fonts for Japanese & Modern look -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --accent: #ff4a85;       /* Neon Pink */
+      --accent2: #ff85a7;      /* Light Pink */
+      --accent-glow: rgba(255, 74, 133, 0.35);
+      --bg: #0d0811;           /* Deep Cyberpunk Dark */
+      --card: rgba(22, 14, 28, 0.75);
+      --border: rgba(255, 74, 133, 0.25);
+      --text: #ffeef3;
+      --muted: #a6929a;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      font-family: 'Plus Jakarta Sans', 'Noto Sans JP', sans-serif;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Ambient Pink Glowing Orbs */
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::before {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(255, 74, 133, 0.12) 0%, transparent 70%);
+      top: -100px; left: -100px;
+      animation: orbFloat 18s ease-in-out infinite;
+    }
+    body::after {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(255, 133, 167, 0.08) 0%, transparent 70%);
+      bottom: -80px; right: -80px;
+      animation: orbFloat 22s ease-in-out infinite reverse;
+    }
+    @keyframes orbFloat {
+      0%,100% { transform: translate(0,0) scale(1); }
+      33%      { transform: translate(30px,-20px) scale(1.05); }
+      66%      { transform: translate(-20px,30px) scale(0.96); }
+    }
+
+    /* Sakura Falling Animation */
+    .sakura-container {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 1; overflow: hidden;
+    }
+    .sakura {
+      position: absolute; background: linear-gradient(135deg, #ffb3c6, #ff85a7);
+      border-radius: 100% 0% 100% 100% / 100% 0% 100% 100%;
+      opacity: 0.7; transform-style: preserve-3d;
+      animation: fall linear infinite;
+    }
+    @keyframes fall {
+      0% { transform: translateY(-10px) rotate(0deg); opacity: 0; }
+      10% { opacity: 0.7; }
+      90% { opacity: 0.7; }
+      100% { transform: translateY(105vh) translateX(100px) rotate(360deg); opacity: 0; }
+    }
+
+    /* Loading Screen */
+    #loading {
+      position: fixed; inset: 0;
+      background: var(--bg);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.6s ease;
+    }
+    .loader-ring {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      border-top-color: var(--accent);
+      animation: spin 1.2s linear infinite;
+      margin-bottom: 20px;
+      position: relative;
+    }
+    .loader-ring::after {
+      content: '';
+      position: absolute; inset: 6px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      border-top-color: var(--accent2);
+      animation: spin 0.9s linear infinite reverse;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loader-text {
+      font-size: 0.85rem;
+      letter-spacing: 4px;
+      color: var(--accent2);
+      text-transform: uppercase;
+      opacity: 0.8;
+      font-weight: 600;
+    }
+
+    .container { position: relative; z-index: 2; padding: 20px; width: 100%; display: flex; justify-content: center; }
+
+    /* Glassmorphism Card Design */
+    .card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 45px 35px 40px;
+      text-align: center;
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      box-shadow: 0 0 0 1px rgba(255, 74, 133, 0.05), 0 20px 50px rgba(0,0,0,0.6);
+      transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.4s ease;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 0 1px rgba(255, 74, 133, 0.2), 0 28px 60px rgba(0,0,0,0.7), 0 0 40px var(--accent-glow);
+    }
+
+    /* Logo / Icon Area */
+    .logo-wrap {
+      width: 76px; height: 76px;
+      margin: 0 auto 24px;
+      background: linear-gradient(135deg, rgba(255, 74, 133, 0.2), rgba(255, 133, 167, 0.1));
+      border: 1px solid rgba(255, 74, 133, 0.35);
+      border-radius: 22px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.2rem;
+      color: var(--accent2);
+      position: relative;
+      text-shadow: 0 0 10px rgba(255, 74, 133, 0.5);
+    }
+
+    .bot-name {
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #fff, #ff85a7, #ff4a85);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 4px;
+    }
+    .bot-subtitle {
+      font-size: 0.75rem;
+      color: var(--accent2);
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-bottom: 32px;
+      font-weight: 600;
+    }
+
+    .divider {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 24px;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 74, 133, 0.4), transparent);
+    }
+    .divider span { font-size: 0.72rem; color: var(--muted); letter-spacing: 3px; font-weight: 600; }
+
+    /* Input Styling */
+    .input-row {
+      display: flex;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 74, 133, 0.2);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 24px;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .input-row:focus-within {
+      border-color: rgba(255, 74, 133, 0.6);
+      box-shadow: 0 0 15px rgba(255, 74, 133, 0.15);
+    }
+    .input-row input {
+      flex: 1;
+      padding: 16px 20px;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-size: 1rem;
+    }
+    .input-row input::placeholder { color: rgba(255, 238, 243, 0.3); }
+
+    /* Button Styling */
+    .input-row button {
+      padding: 16px 26px;
+      background: linear-gradient(135deg, #ff4a85, #d9265f);
+      border: none;
+      cursor: pointer;
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      transition: opacity 0.2s, transform 0.15s;
+      box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+    }
+    .input-row button:hover  { opacity: 0.92; }
+    .input-row button:active { transform: scale(0.96); }
+
+    /* Messages & Results */
+    .msg {
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 0.9rem;
+      text-align: left;
+      line-height: 1.6;
+    }
+    .msg.error   { background: rgba(239, 68, 68, 0.12);  border-left: 3px solid #ef4444; color: #fca5a5; }
+    .msg.success { background: rgba(255, 74, 133, 0.12); border-left: 3px solid var(--accent); color: #ffb3c6; }
+    .msg.info    { background: rgba(255, 255, 255, 0.04); border-left: 3px solid rgba(255, 255, 255, 0.15); color: var(--muted); }
+
+    .code-box {
+      background: rgba(255, 74, 133, 0.08);
+      border: 1px solid rgba(255, 74, 133, 0.3);
+      border-radius: 14px;
+      padding: 20px;
+      margin: 18px 0 10px;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, transform 0.15s;
+    }
+    .code-box:hover { background: rgba(255, 74, 133, 0.14); border-color: rgba(255, 74, 133, 0.5); transform: translateY(-2px); }
+    .code-box:active { transform: scale(0.99); }
+    .code-label { font-size: 0.75rem; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; font-weight: 600; }
+    .code-value { font-size: 1.5rem; font-weight: 800; letter-spacing: 4px; color: #fff; font-family: 'Courier New', monospace; text-shadow: 0 0 10px rgba(255,74,133,0.3); }
+    .copy-hint  { font-size: 0.75rem; color: var(--accent2); margin-top: 8px; opacity: 0.8; }
+
+    #waiting { display: none; color: var(--muted); font-size: 0.9rem; padding: 8px 0; font-weight: 600; }
+    .dots span {
+      display: inline-block;
+      animation: dotBounce 1.4s infinite;
+      font-size: 1.2rem;
+      color: var(--accent);
+    }
+    .dots span:nth-child(2) { animation-delay: 0.2s; }
+    .dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes dotBounce {
+      0%,80%,100% { transform: translateY(0); opacity: 0.4; }
+      40% { transform: translateY(-6px); opacity: 1; }
+    }
+
+    .footer {
+      margin-top: 28px;
+      font-size: 0.72rem;
+      color: rgba(255, 238, 243, 0.25);
+      letter-spacing: 2px;
+      font-weight: 600;
+    }
+
+    @media (max-width: 480px) {
+      .card { padding: 35px 22px; border-radius: 22px; }
+      .input-row { flex-direction: column; border-radius: 14px; }
+      .input-row button { border-radius: 0 0 14px 14px; width: 100%; box-shadow: 0 -5px 15px rgba(0,0,0,0.1); }
+      .bot-name { font-size: 1.5rem; }
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 74, 133, 0.3); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+  <!-- Sakura Background Elements -->
+  <div class="sakura-container" id="sakura-bg"></div>
+
+  <!-- Loading Screen -->
+  <div id="loading">
+    <div class="loader-ring"></div>
+    <div class="loader-text">Loading SHANA Developee...</div>
+  </div>
+
+  <div class="container">
+    <div class="card">
+      <div class="logo-wrap"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+      <div class="bot-name">SHANA BASE</div>
+      <div class="bot-subtitle">アキラ — BOT PAIRING</div>
+      <div class="divider"><span>ENTER NUMBER / 電話番号</span></div>
+
+      <div class="input-row">
+        <input id="number" type="tel" placeholder="+94xxxxxxxxx" autocomplete="off" />
+        <button id="submit">Pair</button>
+      </div>
+
+      <div id="waiting">
+        Please wait / 少々お待ちください <span class="dots"><span>.</span><span>.</span><span>.</span></span>
+      </div>
+
+      <div id="result"></div>
+      <div class="footer">© SHANA_DEVELOPER — ALL RIGHTS RESERVED</div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
+  <script>
+    // Create Sakura Petals Dynamically
+    const sakuraContainer = document.getElementById('sakura-bg');
+    for (let i = 0; i < 20; i++) {
+      const petal = document.createElement('div');
+      petal.classList.add('sakura');
+      petal.style.left = Math.random() * 100 + '%';
+      petal.style.width = Math.random() * 10 + 8 + 'px';
+      petal.style.height = Math.random() * 10 + 8 + 'px';
+      petal.style.animationDelay = Math.random() * 8 + 's';
+      petal.style.animationDuration = Math.random() * 10 + 8 + 's';
+      sakuraContainer.appendChild(petal);
+    }
+
+    const numEl     = document.getElementById('number');
+    const submitBtn = document.getElementById('submit');
+    const resultEl  = document.getElementById('result');
+    const waitingEl = document.getElementById('waiting');
+    const loadingEl = document.getElementById('loading');
+
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        loadingEl.style.opacity = '0';
+        setTimeout(() => loadingEl.style.display = 'none', 600);
+      }, 1200);
+    });
+
+    numEl.addEventListener('focus', () => numEl.closest('.input-row').style.transform = 'scale(1.01)');
+    numEl.addEventListener('blur',  () => numEl.closest('.input-row').style.transform = '');
+
+    function showMsg(html) { resultEl.innerHTML = html; }
+
+    async function copyCode(code) {
+      try {
+        await navigator.clipboard.writeText(code);
+        document.querySelector('.code-value').textContent = '✓ COPIED!';
+        document.querySelector('.copy-hint').textContent = 'Paste this code in WhatsApp';
+        setTimeout(() => {
+          const v = document.querySelector('.code-value');
+          if (v) { v.textContent = code; document.querySelector('.copy-hint').textContent = 'Tap to copy'; }
+        }, 2500);
+      } catch (_) {}
+    }
+
+    submitBtn.addEventListener('click', async () => {
+      const raw = numEl.value.replace(/[^0-9]/g, '');
+      if (!raw) return showMsg('<div class="msg error"><i class="fas fa-exclamation-circle"></i> Please enter your WhatsApp number with country code.</div>');
+      if (raw.length < 10) return showMsg('<div class="msg error"><i class="fas fa-exclamation-circle"></i> Number too short. Include your country code (e.g. +94xxxxxxxxx).</div>');
+
+      numEl.type  = 'text';
+      numEl.value = '+' + raw;
+      numEl.style.color = '#ff85a7';
+
+      resultEl.innerHTML = '';
+      waitingEl.style.display = 'block';
+      submitBtn.disabled = true;
+
+      try {
+        const { data } = await axios.get(`/code?number=${raw}`);
+        waitingEl.style.display = 'none';
+        submitBtn.disabled = false;
+        const code = data.code || 'UNAVAILABLE';
+        showMsg(`
+          <div class="msg success"><i class="fas fa-check-circle"></i> Pairing code generated successfully!</div>
+          <div class="code-box" onclick="copyCode('${code}')">
+            <div class="code-label">Your Pairing Code</div>
+            <div class="code-value">${code}</div>
+            <div class="copy-hint">Tap to copy</div>
+          </div>
+          <div class="msg info">
+            <strong>How to use:</strong><br>
+            1. Open WhatsApp → Settings → Linked Devices<br>
+            2. Tap "Link a Device" → "Link with phone number"<br>
+            3. Enter the code above
+          </div>
+        `);
+      } catch (_) {
+        waitingEl.style.display = 'none';
+        submitBtn.disabled = false;
+        showMsg('<div class="msg error"><i class="fas fa-times-circle"></i> Connection failed. Please try again.</div>');
+      }
+    });
+
+    numEl.addEventListener('keydown', e => { if (e.key === 'Enter') submitBtn.click(); });
+  </script>
+</body>
+</html>
