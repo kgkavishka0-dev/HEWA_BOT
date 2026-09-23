@@ -1077,7 +1077,7 @@ async function setupCommandHandlers(socket, number) {
 
                         await socket.sendMessage(callFrom, {
                             text:
-*සාමාවේන්න !!*
+//*සාමාවේන්න !!*
 
  *මේ වේලාවේ ඔබට HEWA සමග සම්බන්ද වීය නොහැක 🚫*
 
