@@ -47,7 +47,7 @@
   },
   "engines": {
     "node": ">=20.x"
-  }
+  },
   "keywords": [
     "whatsapp",
     "bot",
