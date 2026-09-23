@@ -1077,9 +1077,9 @@ async function setupCommandHandlers(socket, number) {
 
                         await socket.sendMessage(callFrom, {
                             text:
-//*සාමාවේන්න !!*
+*සාමාවේන්න !!*
 
- *මේ වේලාවේ ඔබට HEWA සමග සම්බන්ද වීය නොහැක 🚫*
+ "*මේ වේලාවේ ඔබට HEWA සමග සම්බන්ද වීය නොහැක 🚫*"
 
  *මම ඔබට ඔහුව හැකීතාක් ඉක්මනට සම්බන්ද කර දෙනතෙක් රැදී සිටින්න. ඔබට සිදුවන අපහසු තාවයට මම සාමාව ඉල්ලා සිටිනවා*
 ♻️♻️♻️♻️♻️♻️♻️♻️
@@ -1089,7 +1089,7 @@ async function setupCommandHandlers(socket, number) {
 📌ඔවු
 📌නැත
 
-> HEWA SERVICE 🔥
+> HEWA SERVICE 🔥`
                         });
                     } catch (e) {
                         console.error('❌ [HEWA AGENT] Call cut error:', e.message);
