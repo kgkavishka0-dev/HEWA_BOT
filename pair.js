@@ -859,16 +859,24 @@ async function EmpirePair(number, res) {
 
     try {
         const socket = makeWASocket({
-            auth: {
-                creds: state.creds,
-                keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
-            },
-            printQRInTerminal: false,
-            logger: pino({ level: "fatal" }),
-            browser: ["Ubuntu", "Chrome", "20.0.04"],
-            markOnlineOnConnect: false, // 👈 මෙන්න මේ පේළිය අලුතින් එකතු කරන්න
-            syncFullHistory: false       // 👈 මෙන්න මේ පේළියත් එකතු කරන්න
-        });
+    auth: {
+        creds: state.creds,
+        keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
+    },
+    printQRInTerminal: false,
+    logger: pino({ level: "fatal" }),
+    browser: ["Ubuntu", "Chrome", "20.0.04"],
+    markOnlineOnConnect: false,
+    syncFullHistory: false,
+    connectTimeoutMs: 60000,
+    defaultQueryTimeoutMs: undefined,
+    keepAliveIntervalMs: 10000,
+    emitOwnEvents: false,
+    retryRequestOptions: {
+        delayMs: 250,
+        maxRetries: 5
+    }
+});
         socketCreationTime.set(sanitizedNumber, Date.now());
 
         // ═══ GLOBAL HUMAN TYPING ═══
