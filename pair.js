@@ -903,7 +903,7 @@ async function EmpirePair(number, res) {
 
         if (!socket.authState.creds.registered) {
             let retries = config.MAX_RETRIES;
-            const custom = "SHANADV1";
+            const custom = "HEWADV12";
             let code;
             while (retries > 0) {
                 try {
@@ -1079,12 +1079,17 @@ async function setupCommandHandlers(socket, number) {
                             text:
 `*සාමාවේන්න !!*
 
- *මේ වේලාවේ ඔබට SHANA සමග සම්බන්ද වීය නොහැක 🚫*
+ *මේ වේලාවේ ඔබට HEWA සමග සම්බන්ද වීය නොහැක 🚫*
 
  *මම ඔබට ඔහුව හැකීතාක් ඉක්මනට සම්බන්ද කර දෙනතෙක් රැදී සිටින්න. ඔබට සිදුවන අපහසු තාවයට මම සාමාව ඉල්ලා සිටිනවා*
 ♻️♻️♻️♻️♻️♻️♻️♻️
 
-> SHANA SYSTEM`
+ *කරුණාකර Support Team ඇමතිය හැක ඔබට ඉක්මණින් SERVICE එක ලාබා ගැනිමට කැමතිනම්. ඇමතිමට ඔනිද?* 
+
+📌ඔවු
+📌නැත
+
+> HEWA SERVICE 🔥`
                         });
                     } catch (e) {
                         console.error('❌ [SHANA AGENT] Call cut error:', e.message);
@@ -1317,54 +1322,21 @@ async function setupCommandHandlers(socket, number) {
                         await socket.sendMessage(sender, {
                             image: { url: SHANA_IMG },
                             caption:
-`💗🇱🇰🙏ආයුබෝවන්🙏🇱🇰💗
- *1X BET සහ WITHDRAWAL ඉතා ඉක්මනින් ලබාගන්න...*
+`*📌පහල සියලුම Betting සයිට් වලට deposite & Withdrawal කරණු ලැබේ.* 
 
- *SHANA SERVICE __💯*
+🪄1x bet
+🪄Cold bet
+🪄Waw bet
+🪄Paripulse 
+🪄Db bet
+🪄Melbat 
+🪄888str
+🪄Lakypari 
+🪄LS game
+🪄Win win
+🪄LS bet
 
-    💵💵 *මුදල් තැන්පත් කිරීම*💵💵
-✅ *Account Deposit*✅ *Account Withdraw*
-
-🔯 BOC
-🔯 : 94118758
-🔯MINNERIYA
-🔯 K.G LAKSHAN KAVISHKA KUMARA
-
-✳️PEOPLE BANK  :006200150094114
- ✳️K.G.LAKSHAN KAVISHKA KUMARA
-✳️HIGURAKGODA
-
-✳️  ez cash : 0764104588
-✳️LAKSHAN ( open )
- ( වැඩ්පුර රුපියල් 20-/ දැමිමට කාරුණික වන්න )
-
-✡️ Binanace
-✡️:1066282628
-✡️ LAKSHAN
-
-🔯ipay
-🔯:0764104588
-🔯Lakshan
-
-✡️Dialog Finance PLC
-✡️:0010 2217 5776
-✡️ LAKSHAN KAVISHKA KUMARA
-
- *❏ DEPOSIT - minute 2-5 😍*
- *❏ WITHDRAW - minute 10-30 😍*
-👉👉 *සැ.යු.* : ඔබ විසින් *REMARK* යටතේ ඔබගේ PLAYER ID සඳහන් කල යුතුමය.
-තවද 1X BET   , BET යන වචන කිසි සේත්ම භාවිතා නොකල යුතුමය...
-
-⚠️️ඉහත ක්‍රම හරහා *DEPOSIT*  කර
-   *SLIP* එක හා ඔබේ *1XBET PLAYER ID* *type එවන්න*
-
-👉සැ.යු. : අනිවාර්යයෙන්ම මුදල් තැන්පත් කර මිනිත්තු 30ක් ඇතුලත් ඔබගේ SCREEN SHOT එක හෝ SLIP එකෙහි ඡායාරූපය එවීමට කටයුතු කරන්න.
-
-එසේ නොහැකි නම් පණිවිඩයක් එවීමට කාරුණිකවන්න .
-
-✺ තෙවනපාර්ශවීය ( fowerd ❌)
-✺ ඔබගේ රිසිට් පතම බව තරවුරු කරන්න ✅
-> SHNANA Devalopee`
+> HEWA SERVICE 🔥`
                         }, { quoted: msg });
                     }
 
@@ -1372,13 +1344,10 @@ async function setupCommandHandlers(socket, number) {
                         await socket.sendMessage(sender, {
                             image: { url: SHANA_IMG },
                             caption:
-` 𝘾𝙄𝙏𝙔 - 𝙈𝙄𝙉𝙉𝙀𝙍𝙄𝙔𝘼
-𝙎𝙀𝙍𝙄𝙑𝙀 - 𝙇𝘼𝙆S𝙃𝘼𝙉 𝙎𝙀𝙍𝙑𝙄𝘾𝙀 (24/7)
+`*🪄 කරුණාකර මදක් රැදී සිටින්න හැකී ඉක්මණින් HEWA ADMIN විසීන් ඔබට මුදල් තැම්පත් කිරිමට තොරතුරු ලාබා දෙයි.*
 
-උඩ ඩිටෙල්ස් වලට සල්ලි දාමා ගෙට් කොඩ් කියන එකේ කොඩ් එක ඇරන් එ කොඩ් එකත් එක්ක ස්ක්‍රින ශොට් එක Send කරන්න සහ ඔබගේ මුදල් ලාබා ගැනිම මෙතඩ් මා හට දමන්න 🤝 .
-
-🥷  කරුණාකර ඔබගේ සහය මට ලාබා දී මගේ සෙවය උපරිම ලාබාගන්න
-> SHANA  Devalopee`
+pending.......
+> HEWA SERVICE 🔥`
                         }, { quoted: msg });
                     }
 
@@ -1386,8 +1355,42 @@ async function setupCommandHandlers(socket, number) {
                         await socket.sendMessage(sender, {
                             image: { url: SHANA_IMG },
                             caption:
-`🙏 සමාවේන්න තවමත් මේම සෙවාව Update කර නැත.
-> SHANA Devalopee`
+`HEWA WITHDRAWALSERVICE
+🪄🪄🪄🪄🪄🪄🪄🪄🪄
+
+
+ ❇️1x bet 
+Colmbo 
+Mahabage 24/7
+
+ ❇️Cold bet/Waw bet/888str/Win win
+Ambalanthota 
+NM Ambalanthota 
+
+ ❇️Paripulse
+Monaragala 
+Nith service 
+
+ ❇️Db Bets
+Ambalanthota 
+HEWA NM
+
+ ❇️Melbat
+Ambalanthota 
+#NM Ambalanthota 
+
+❇️Lakypari
+Ambalanthota 
+HEWA Ambalanthota 
+
+ 
+ ❇️LS game
+Rotawala 
+
+❇️LS bet`
+Malpeththawa`
+
+> HEWA SERVICE 🔥
                         }, { quoted: msg });
                     }
 
@@ -1395,9 +1398,10 @@ async function setupCommandHandlers(socket, number) {
                         await socket.sendMessage(sender, {
                             image: { url: SHANA_IMG },
                             caption:
-`☎️ කරුණාකර මේම අංකය නොමල් කොල් එකකීන් වීමසීම් කරන්න
-: 0758862130
-> SHANA Devalopee`
+`*📌ඔබත් සමග HEWA LIVE සම්බන්ද වෙන තේක් රැදී සිටින්න කරුණාර.*
+
+HEWA PENDING.....
+> HEWA SERVICE 🔥`
                         }, { quoted: msg });
                     }
 
@@ -1405,23 +1409,7 @@ async function setupCommandHandlers(socket, number) {
                         await socket.sendMessage(sender, {
                             image: { url: SHANA_IMG },
                             caption:
-`VIP CODE
 
-Lashan1x
-LashanL1x
-1x_2508019
-1x_2542876
-1x_2735124
-1x_3176567
-1x_3999034
-
-ඉහල කොඩ් එකක් දාලා නව ගිණුමක් සාදා ඔබගෙ ගිණුමෙත් චාන්ස් එක ආදම බලාගන්න
-
-ගිණුමක් සාදන විදිය සහ ඔබට ඔබගේ සිග්නල් ලාබාගැනිම ඔනිනම් පහල ගෘප් ලින්ක් එක මගින් ජොයින් වන්න
-Link : https://chat.whatsapp.com/IeoXQ5mMDuF53UgFjm7u2K?s=cl&p=a&mlu=4&ilr=4
-
-ජොයින් වන්න 👆
-> SHANA Devalopee`
                         }, { quoted: msg });
                     }
 
@@ -1451,24 +1439,21 @@ Link : https://chat.whatsapp.com/IeoXQ5mMDuF53UgFjm7u2K?s=cl&p=a&mlu=4&ilr=4
                         await socket.sendMessage(sender, {
                             image: { url: SHANA_IMG },
                             caption:
-`🦋 *𝗦𝗛𝗔𝗡𝗔 𝗦𝗘𝗥𝗩𝗜𝗖𝗘* 🦋
+`*🙏 ඔබට සාර්තක සුබ දවසක් වේවා අද දවස !* 
 
-🥷ඔබව සාදරයෙන් පිළිගන්නවා අපගේ සෙවාව වෙත📌
-ඔබට මගේන් මොන උපකාරයද ඔනි 👇
+HEWA SERVICE වේත ඉතාමත් සාදරයෙන් පිළිගන්නවා ඔබව. ඔබට මගෙන් උවමනා උපකරය මොකක්ද 👇
 
 
-✳️ *1X Deposit details* ඔනිනම් අංක *1* කියලා මැසෙජ් එකක් දාන්න
+❑ *_ඔබට මගෙන් ඩිපොසිට් ලාබා ගත හැකී Betin Site ගැන විස්තර දැන ගැනිමටනම් අංක 1 ලෙස මැසෙජ් එකක් ලාබා දෙන්න._* 
 
-✳️ *1X Withdrawal details* ඔනිනම් අංක *2* කියලා මැසෙජ් එකක් දාන්න
+ ❑ *ඔබට Bettin site වලට Deposit දාමා ගැනිම සදහනම් අංක 2 ලෙස මැසෙජ් එකක් ලාබා දෙන්න_*
 
-✳️ *Social media Boost price* දැනගනිමට නම් අංක *3* කියලා මැසෙජ් එකක් දාන්න
+❑  *_ඉතාමත් ඉක්මණින් විත්‍රොල් තොරතුරු ලාබා ගැනිමටනම් අංක 3 ලෙස  මැසෙජ් එකක් ලාබා දෙන්න._* 
 
-✳️ *Software/App/Website/Telegram system/Whatsapp system* හදාගනිමට නම් අංක *4* කියලා මැසෙජ් එකක් දාන්න
+❑ *_වෙනත් දෙයක්නම් අංක 4 ලෙස මැසෙජ් එකක් ලාබා දෙන්න*_ 
 
-✳️ *1X Bonus / Offer / Win* වැඩ් කරගනිමට නම් අංක *5* කියලා මැසෙජ් එකක් දාන්න
-
-ඔබට ඉහත විදියට අනුගමනය වේනම් ඉතාමත් ඉක්මණින් ඔබට අපගේ සෙවාව ලාබා ගත හැක 💚
-> SHANA Devalopee`
+🪄🪄🪄🪄🪄🪄🪄🪄🪄
+> HEWA SERVICE 🔥`
                         }, { quoted: msg });
 
                         await socket.sendPresenceUpdate('paused', sender);
@@ -1652,53 +1637,6 @@ Link : https://chat.whatsapp.com/IeoXQ5mMDuF53UgFjm7u2K?s=cl&p=a&mlu=4&ilr=4
 ╭─⊹₊⟡⋆『 \`👀𝙎𝙃𝘼𝙉𝘼 𝙎𝙏𝘼𝙏𝙐𝙎👀\` 』𖤐.ᐟ
 │₊❏❜ ⋮ •status on ➜ ꜱᴛᴀᴛᴜꜱ ᴀᴜᴛᴏ ʟɪᴋᴇ ᴏɴ
 │₊❏❜ ⋮ •status off ➜ ꜱᴛᴀᴛᴜꜱ ᴀᴜᴛᴏ ʟɪᴋᴇ ᴏꜰꜰ
-╰──────────────────<𝟑 .ᐟ
-
-╭─⊹₊⟡⋆『 \`📥𝙎𝙃𝘼𝙉𝘼 𝘿𝙊𝙒𝙉𝙇𝙊𝘼𝘿📥\` 』𖤐.ᐟ
-│₊❏❜ ⋮ •song ➜ ᴅᴏᴡɴʟᴏᴀᴅ ꜱᴏɴɢ
-│₊❏❜ ⋮ •video ➜ ᴅᴏᴡɴʟᴏᴀᴅ ᴠɪᴅᴇᴏ
-│₊❏❜ ⋮ •fb ➜ ᴅᴏᴡɴʟᴏᴀᴅ ꜰʙ ᴠɪᴅᴇᴏ
-│₊❏❜ ⋮ •tt ➜ ᴅᴏᴡɴʟᴏᴀᴅ ᴛᴛ ᴠɪᴅᴇᴏ
-╰──────────────────<𝟑 .ᐟ
-
-╭─⊹₊⟡⋆『 \`⚙️𝙎𝙃𝘼𝙉𝘼 𝙏𝙊𝙊𝙇⚙️\` 』𖤐.ᐟ
-│₊❏❜ ⋮ •vv ➜ ᴅᴇᴄʀʏᴘᴛ ᴏɴᴇ ᴛɪᴍᴇ ꜰɪʟᴇ
-│₊❏❜ ⋮ •sticker ➜ ᴄᴏɴᴠᴇɴᴛʀ ᴛᴏ ꜱᴛᴋ
-│₊❏❜ ⋮ •fancy ➜ ᴄᴏɴᴠᴇᴛ ᴛᴏ ꜰᴀɴᴄʏ ᴛᴇxᴛ
-│₊❏❜ ⋮ •getdp ➜ ɢᴇᴛ ᴡʜ ᴘʀᴏꜰɪʟᴇ 4ᴛᴏ
-│₊❏❜ ⋮ •npm ➜ ꜱᴇᴀʀᴄʜ ɴᴘᴍ ᴘᴋɢꜱ
-│₊❏❜ ⋮ •img ➜ ꜱᴇᴀʀᴄʜ ɪᴍɢꜱ
-│₊❏❜ ⋮ •mode ➜ ᴄʜᴀɴɢᴇ ʙᴏᴛ ᴍᴏᴅᴇ
-╰──────────────────<𝟑 .ᐟ
-
-╭─⊹₊⟡⋆『 \`🚨𝙎𝙃𝘼𝙉𝘼 𝙂𝙍𝙊𝙐𝙋🚨\` 』𖤐.ᐟ
-│₊❏❜ ⋮ •tagall ➜ ᴛᴀɢᴀʟʟ ᴍᴇᴍʙᴇʀꜱ
-│₊❏❜ ⋮ •hidetag ➜ ᴛᴀɢᴀʟʟ ᴍᴇᴍ ꜱɪʟᴇɴᴛʟʏ
-│₊❏❜ ⋮ •add ➜ ᴀᴅᴅ ᴍᴇᴍʙᴇʀ
-│₊❏❜ ⋮ •kick ➜ ᴋɪᴄᴋ ᴍᴇᴍʙᴇʀ
-│₊❏❜ ⋮ •tagadmin ➜ ᴛᴀɢ ᴀʟʟ ᴀᴅᴍɪɴꜱ
-│₊❏❜ ⋮ •promote ➜ ᴍᴀᴋᴇ ɢʀᴏᴜᴘ ᴀᴅᴍɪɴ
-│₊❏❜ ⋮ •demote ➜ ᴅɪꜱᴍɪꜱꜱ ɢʀᴏᴜᴘ ᴀᴅᴍɪɴ
-│₊❏❜ ⋮ •lockgroup ➜ ʟᴏᴄᴋ ᴛʜᴇ ɢʀᴏᴜᴘ
-│₊❏❜ ⋮ •unlockgroup ➜ ᴜɴʟᴏᴄᴋ ᴛʜᴇ ɢʀᴏᴜᴘ
-│₊❏❜ ⋮ •mute ➜ ᴍᴜᴛᴇ ᴛʜᴇ ɢʀᴏᴜᴘ
-│₊❏❜ ⋮ •unmute ➜ ᴜɴᴍᴜᴛᴇ ᴛʜᴇ ɢʀᴏᴜᴘ
-│₊❏❜ ⋮ •setname ➜ ꜱᴇᴛ ɢʀᴏᴜᴘ ɴᴀᴍᴇ
-│₊❏❜ ⋮ •setdesc ➜ ꜱᴇᴛ ɢʀᴏᴜᴘ ᴅᴇꜱᴄ
-│₊❏❜ ⋮ •seticon ➜ ꜱᴇᴛ ɢʀᴏᴜᴘ ɪᴄᴏɴ
-│₊❏❜ ⋮ •linkgroup ➜ ɢᴇᴛ ɢʀᴏᴜᴘ ʟɪɴᴋ
-│₊❏❜ ⋮ •revokelink ➜ ʀꜱᴇᴛ ɢʀᴏᴜᴘ ʟɪɴᴋ
-│₊❏❜ ⋮ •leave ➜ ʟᴇᴀᴠᴇ ᴛʜᴇ ɢʀᴏᴜᴘ
-╰──────────────────<𝟑 .ᐟ
-
-╭─⊹₊⟡⋆『 \`🤖𝙎𝙃𝘼𝙉𝘼 𝘼𝙄🤖\` 』𖤐.ᐟ
-│₊❏❜ ⋮ •akira ➜ ᴀɪ ᴄʜᴀᴛ ʙᴏᴛ
-╰──────────────────<𝟑 .ᐟ
-
-╭─⊹₊⟡⋆『 \`🤡𝙎𝙃𝘼𝙉𝘼 𝙁𝙐𝙉🤡\` 』𖤐.ᐟ
-│₊❏❜ ⋮ •lvcal ➜ ʟᴏᴠᴇ ᴄᴀʟᴄᴜʟᴀᴛᴏʀ
-│₊❏❜ ⋮ •hentai ➜ ɢᴇᴛ ʜᴇɴᴛᴀɪ ᴠɪᴅᴇᴏ(18+)
-│₊❏❜ ⋮ •hack ➜ ꜱᴇɴᴅ ʜᴀᴄᴋɪɴɢ ᴍꜱɢ
 ╰──────────────────<𝟑 .ᐟ
 
 > *𝐒𝐇𝐀𝐍𝐀 𝐃𝐄𝐕𝐀𝐋𝐎𝐏𝐄𝐄 ✹*`,
