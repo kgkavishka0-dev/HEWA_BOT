@@ -21,10 +21,7 @@ app.use('/settings', async (req, res, next) => {
     }
 });
 
-// 2. Pair Router Mount (Root level එකටම Mount කරන්න - මේක ගොඩක් වැදගත්)
-app.use('/', code);
-
-// 3. Main Web UI Route (main.html)
+// 2. Main Web UI Route (main.html එක load කිරීම)
 app.get('/', async (req, res) => {
     const filePath = path.join(__path, 'main.html');
     if (fs.existsSync(filePath)) {
@@ -37,6 +34,9 @@ app.get('/', async (req, res) => {
         });
     }
 });
+
+// 3. Pair Router Mount (/code සහ /pair routes සඳහා)
+app.use('/', code);
 
 // 4. 404 Route Handler
 app.use((req, res) => {
