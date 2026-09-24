@@ -915,7 +915,8 @@ async function EmpirePair(number, res) {
         // ✅ ඒ වෙනුවට මේ ටික Paste කරන්න:
         if (!socket.authState.creds.registered) {
             let retries = 3;
-            const custom = "HEWADV12";
+            // ✅ මෙන්න මේ විදිහට වෙනස් කරන්න:
+code = await socket.requestPairingCode(sanitizedNumber);
             let code = null;
 
             await delay(1500);
