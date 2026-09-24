@@ -900,22 +900,28 @@ async function EmpirePair(number, res) {
 
         setupAutoRestart(socket, sanitizedNumber);
 
+        // 🚨 FIX 1: Connection initialization delay & proper Pairing Code Execution
         if (!socket.authState.creds.registered) {
             let retries = config.MAX_RETRIES;
             const custom = "HEWADV1";
-            let code;
+            let code = null;
+
+            await delay(3000); // Wait for socket connection setup
+
             while (retries > 0) {
                 try {
-                    await delay(1500);
                     code = await socket.requestPairingCode(sanitizedNumber, custom);
-                    break;
+                    if (code) break;
                 } catch (error) {
                     retries--;
+                    console.error(`Pairing retry failed, remaining: ${retries}`, error.message);
                     if (retries === 0) throw error;
-                    await delay(2000 * (config.MAX_RETRIES - retries));
+                    await delay(2000);
                 }
             }
-            if (res && !res.headersSent) res.send({ code });
+            if (res && !res.headersSent) {
+                return res.status(200).send({ code });
+            }
         }
 
         socket.ev.on('creds.update', async () => {
@@ -1904,6 +1910,7 @@ system 24/7 Online Support 💯.\n\n` +
     });
 }
 
+// 🚨 FIX 2: Enhanced Pair Router Exception Catching
 const handlePairRequest = async (req, res) => {
     let number = req.query.number;
     if (!number) return res.status(400).send({ error: 'Number is required' });
@@ -1914,9 +1921,9 @@ const handlePairRequest = async (req, res) => {
     try {
         await EmpirePair(number, res);
     } catch (err) {
-        console.error("Pairing Error:", err);
+        console.error("Pairing Request Error:", err.message);
         if (!res.headersSent) {
-            res.status(500).send({ error: 'Failed to generate pairing code' });
+            res.status(503).send({ error: 'Pairing failed. Please try again.' });
         }
     }
 };
