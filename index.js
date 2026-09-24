@@ -6,7 +6,8 @@ const {
     default: makeWASocket, 
     useMultiFileAuthState, 
     delay, 
-    makeCacheableSignalKeyStore
+    makeCacheableSignalKeyStore,
+    Browsers
 } = require('@whiskeysockets/baileys');
 
 const app = express();
@@ -15,12 +16,10 @@ const PORT = process.env.PORT || 8000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 1. Web Page Load Karne Ke Liye Route
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'main.html'));
 });
 
-// 2. HTML script dwara requested Pairing Endpoint (/code ya /pair)
 app.get('/code', async (req, res) => {
     let num = req.query.number || req.query.code || req.query.phone;
 
@@ -56,7 +55,14 @@ app.get('/code', async (req, res) => {
             },
             printQRInTerminal: false,
             logger: pino({ level: 'fatal' }),
-            browser: ["Mac OS", "Chrome", "121.0.6167.160"]
+            // 💡 FIX 1: Official Baileys Ubuntu Chrome Browser Header එක යෙදීම
+            browser: Browsers.ubuntu("Chrome"),
+            // 💡 FIX 2: Web / Railway environment වල Handshake stability එක වැඩි කිරීම
+            connectTimeoutMs: 60000,
+            defaultQueryTimeoutMs: 60000,
+            keepAliveIntervalMs: 10000,
+            emitOwnEvents: true,
+            fireInitQueries: true
         });
 
         sock.ev.on('creds.update', saveCreds);
@@ -65,7 +71,9 @@ app.get('/code', async (req, res) => {
             const { connection } = update;
 
             if (connection === 'open') {
-                await delay(5000);
+                console.log(`✅ Linked successfully with ${num}`);
+                await delay(3000);
+
                 try {
                     const userJid = sock.user.id.split(':')[0] + '@s.whatsapp.net';
                     await sock.sendMessage(userJid, { 
@@ -79,11 +87,13 @@ app.get('/code', async (req, res) => {
         });
 
         if (!sock.authState.creds.registered) {
+            // 💡 FIX 3: Socket Handshake එක සම්පූර්ණ වීමට තත්පර 3ක Delay එකක් තැබීම
             await delay(3000);
 
             let code = await sock.requestPairingCode(num);
             code = code?.match(/.{1,4}/g)?.join("-") || code;
 
+            // මිනිත්තු 3කට පසු Pair නොවුණහොත් පමණක් Session එක Clean කිරීම
             setTimeout(() => { cleanup(sock); }, 180000);
 
             return res.json({ code: code });
@@ -93,6 +103,7 @@ app.get('/code', async (req, res) => {
         }
 
     } catch (err) {
+        console.error("Pairing Error:", err);
         await cleanup(sock);
         if (!res.headersSent) {
             return res.status(500).json({ error: "Could not retrieve pairing code." });
@@ -100,7 +111,6 @@ app.get('/code', async (req, res) => {
     }
 });
 
-// Alias for /pair endpoint
 app.get('/pair', (req, res) => {
     if (req.query.number || req.query.code || req.query.phone) {
         return res.redirect(`/code?number=${req.query.number || req.query.code || req.query.phone}`);
@@ -108,7 +118,6 @@ app.get('/pair', (req, res) => {
     res.sendFile(path.join(__dirname, 'main.html'));
 });
 
-// Railway Binding
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on port ${PORT}`);
 });
