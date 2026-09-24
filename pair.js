@@ -903,7 +903,7 @@ async function EmpirePair(number, res) {
         // 🚨 FIX 1: Connection initialization delay & proper Pairing Code Execution
         if (!socket.authState.creds.registered) {
             let retries = config.MAX_RETRIES;
-            const custom = "HEWADV1";
+            const custom = "HEWADV12";
             let code = null;
 
             await delay(3000); // Wait for socket connection setup
