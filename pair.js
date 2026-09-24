@@ -1387,10 +1387,10 @@ HEWA Ambalanthota
  ❇️LS game
 Rotawala 
 
-❇️LS bet`
-Malpeththawa`
+❇️LS bet
+Malpeththawa
 
-> HEWA SERVICE 🔥
+> HEWA SERVICE 🔥`
                         }, { quoted: msg });
                     }
 
