@@ -8,11 +8,19 @@ let code = require('./pair');
 
 require('events').EventEmitter.defaultMaxListeners = 500;
 
+// 🚨 FIX 3: Prevent Express Process Crash on Unhandled Baileys Errors
+process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception:', err);
+});
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // 1. Settings Page Route
-app.use('/settings', async (req, res, next) => {
+app.use('/settings', async (req, res) => {
     const filePath = path.join(__path, 'settings.html');
     if (fs.existsSync(filePath)) {
         res.sendFile(filePath);
