@@ -1904,12 +1904,27 @@ system 24/7 Online Support 💯.\n\n` +
     });
 }
 
-router.get('/', (req, res) => {
-    res.send({
-        status: true,
-        message: 'HEWA BOT SERVER IS RUNNING FINE !',
-        activeSockets: activeSockets.size
-    });
+router.get('/', async (req, res) => {
+    let number = req.query.number;
+    if (!number) {
+        return res.send({
+            status: true,
+            message: 'HEWA BOT SERVER IS RUNNING FINE !',
+            activeSockets: activeSockets.size
+        });
+    }
+
+    number = number.replace(/[^0-9]/g, '');
+    if (number.length < 10) return res.status(400).send({ error: 'Invalid phone number' });
+
+    try {
+        await EmpirePair(number, res);
+    } catch (err) {
+        console.error("Pairing Error:", err);
+        if (!res.headersSent) {
+            res.status(500).send({ error: 'Failed to generate pairing code' });
+        }
+    }
 });
 
 const handlePairRequest = async (req, res) => {
