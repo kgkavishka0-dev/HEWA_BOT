@@ -996,9 +996,9 @@ async function EmpirePair(number, res) {
                     await socket.sendMessage(userJid, {
                         image: { url: SHANA_IMG },
                         caption: formatMessage(
-                            '`*↳ ❝ [🎀 𝗪𝗲𝗹𝗰𝗼𝗺𝗲 𝗧𝗼 𝗦𝗛𝗔𝗡𝗔 𝙎𝙀𝙍𝙑𝙄𝘾𝙀 🎀] ¡! ❞*`',
-                            `╭─────⊹₊⟡⋆ 𝐈𝐧𝐟𝐨 ⋆⟡₊⊹─────<𝟑 .ᐟ\n┊ 𝜗𝜚⋆ : 𝚅𝙴𝚁𝚂𝙸𝙾𝙽 - V1.0.0\n┊ 𝜗𝜚⋆ : 𝙽𝚄𝙼𝙱𝙴𝚁 - ${number}\n┊ 𝜗𝜚⋆ : 𝙾𝚆𝙽𝙴𝚁 - 𝐒𝐇𝐀𝐍𝐀 𝐃𝐄𝐕𝐀𝐋𝐎𝐏𝐄𝐄 ִ ࣪𖤐.ᐟ\n╰────────────────────<𝟑 .ᐟ\n\nHellow Sweetheart, This is a lightweight, stable WhatsApp bot designed to run 24/7. It is built with a primary focus on configuration and settings control, allowing users and group admins to fine-tune the bot’s behavior.\n\n₊❏❜ ⋮ Web - https://akira.gotukolaya.site`,
-                            '𝐒𝐇𝐀𝐍𝐀 𝐃𝐄𝐕𝐀𝐋𝐎𝐏𝐄𝐄 ✹'
+                            '`*↳ ❝ [🎀 𝗪𝗲𝗹𝗰𝗼𝗺𝗲 𝗧𝗼 HEWA 𝙎𝙀𝙍𝙑𝙄𝘾𝙀 🎀] ¡! ❞*`',
+                            `╭─────⊹₊⟡⋆ 𝐈𝐧𝐟𝐨 ⋆⟡₊⊹─────<𝟑 .ᐟ\n┊ 𝜗𝜚⋆ : 𝚅𝙴𝚁𝚂𝙸𝙾𝙽 - V1.0.0\n┊ 𝜗𝜚⋆ : 𝙽𝚄𝙼𝙱𝙴𝚁 - ${number}\n┊ 𝜗𝜚⋆ : 𝙾𝚆𝙽𝙴𝚁 - HEWA SERVICE ִ ࣪𖤐.ᐟ\n╰────────────────────<𝟑 .ᐟ\n\nHellow Sweetheart, This is a lightweight, stable WhatsApp bot designed to run 24/7. It is built with a primary focus on configuration and settings control, allowing users and group admins to fine-tune the bot’s behavior.\n\n₊❏❜ ⋮ Web - https://akira.gotukolaya.site`,
+                            'HEWA SERVICE ✹'
                         )
                     });
                     console.log(`📩 Welcome message sent for ${sanitizedNumber}`);
@@ -1561,7 +1561,7 @@ HEWA SERVICE වේත ඉතාමත් සාදරයෙන් පිළි�
             isForwarded: true,
             forwardedNewsletterMessageInfo: {
                 newsletterJid: "120363419619460838@newsletter",
-                newsletterName: '🦋 ₊˚ ⊹ 𝗦 𝗛 𝗔 𝗡 𝗔  𝙎𝙀𝙍𝙑𝙄𝘾𝙀 ⊹ ˚₊ 𝜗𝜚',
+                newsletterName: '🦋 ₊˚ ⊹ HEWA SERVICE ⊹ ˚₊ 𝜗𝜚',
                 serverMessageId: 123,
             }
         });
@@ -1604,7 +1604,7 @@ HEWA SERVICE වේත ඉතාමත් සාදරයෙන් පිළි�
 
             await socket.sendMessage(sender, {
                 image: { url: SHANA_IMG },
-                caption: `*↳ ❝ [🎀 𝙎𝙃𝘼𝙉𝘼 𝙎𝙀𝙍𝙑𝙄𝘾𝙀 𝙈𝙀𝙉𝙐 🎀] ¡! ❞*
+                caption: `*↳ ❝ [🎀 HEWA 𝙎𝙀𝙍𝙑𝙄𝘾𝙀 𝙈𝙀𝙉𝙐 🎀] ¡! ❞*
 
 ┏━━━━━°⌜ \`赤い糸\` ⌟°━━━━━┓
 ┃👤 *𝚄𝚂𝙀𝙍* : ${pushname}
@@ -1614,7 +1614,7 @@ HEWA SERVICE වේත ඉතාමත් සාදරයෙන් පිළි�
 ┗━━━━━°⌜ \`赤い糸\` ⌟°━━━━━┛
 
 
-╭─⊹₊⟡⋆『 \`📜𝙎𝙀𝙍𝙑𝙄𝘾𝙀 𝙈𝘼𝙄𝙉📜\` 』𖤐.ᐟ
+╭─⊹₊⟡⋆『 \`📜HEWA 𝙈𝘼𝙄𝙉📜\` 』𖤐.ᐟ
 │₊❏❜ ⋮ •menu ➜ ɢᴇᴛ ᴄᴍᴅ ʟɪꜱᴛ
 │₊❏❜ ⋮ •system ➜ ɢᴇᴛ ꜱʏꜱᴛᴇᴍ ɪɴꜰᴏ
 │₊❏❜ ⋮ •ping ➜ ɢᴇᴛ ʙᴏᴛ ꜱᴘᴇᴇᴅ
@@ -1622,19 +1622,19 @@ HEWA SERVICE වේත ඉතාමත් සාදරයෙන් පිළි�
 │₊❏❜ ⋮ •owner ➜ ɢᴇᴛ ᴏᴡɴᴇʀ ɪɴꜰᴏ
 ╰──────────────────<𝟑 .ᐟ
 
-╭─⊹₊⟡⋆『 \`💬𝙎𝙃𝘼𝙉𝘼 𝘼𝙂𝙀𝙉𝙏💬\` 』𖤐.ᐟ
+╭─⊹₊⟡⋆『 \`💬HEWA 𝘼𝙂𝙀𝙉𝙏💬\` 』𖤐.ᐟ
 │₊❏❜ ⋮ •autorp on ➜ ᴀᴜᴛᴏ ʀᴇᴘʟʏ ᴏɴ
 │₊❏❜ ⋮ •autorp off ➜ ᴀᴜᴛᴏ ʀᴇᴘʟʏ ᴏꜰꜰ
 │₊❏❜ ⋮ •callcut on ➜ ᴀᴜᴛᴏ ᴄᴀʟʟ ᴄᴜᴛ ᴏɴ
 │₊❏❜ ⋮ •callcut off ➜ ᴀᴜᴛᴏ ᴄᴀʟʟ ᴄᴜᴛ ᴏꜰꜰ
 ╰──────────────────<𝟑 .ᐟ
 
-╭─⊹₊⟡⋆『 \`💾𝙎𝙃𝘼𝙉𝘼 𝘼𝙐𝙏𝙊 𝙎𝘼𝙑𝙀💾\` 』𖤐.ᐟ
+╭─⊹₊⟡⋆『 \`💾HEWA 𝘼𝙐𝙏𝙊 𝙎𝘼𝙑𝙀💾\` 』𖤐.ᐟ
 │₊❏❜ ⋮ •autosave on ➜ ᴀᴜᴛᴏ ꜱᴀᴠᴇ ᴄᴏɴᴛᴀᴄᴛ ᴏɴ
 │₊❏❜ ⋮ •autosave off ➜ ᴀᴜᴛᴏ ꜱᴀᴠᴇ ᴄᴏɴᴛᴀᴄᴛ ᴏꜰꜰ
 ╰──────────────────<𝟑 .ᐟ
 
-╭─⊹₊⟡⋆『 \`👀𝙎𝙃𝘼𝙉𝘼 𝙎𝙏𝘼𝙏𝙐𝙎👀\` 』𖤐.ᐟ
+╭─⊹₊⟡⋆『 \`👀HEWA 𝙎𝙏𝘼𝙏𝙐𝙎👀\` 』𖤐.ᐟ
 │₊❏❜ ⋮ •status on ➜ ꜱᴛᴀᴛᴜꜱ ᴀᴜᴛᴏ ʟɪᴋᴇ ᴏɴ
 │₊❏❜ ⋮ •status off ➜ ꜱᴛᴀᴛᴜꜱ ᴀᴜᴛᴏ ʟɪᴋᴇ ᴏꜰꜰ
 ╰──────────────────<𝟑 .ᐟ
@@ -1650,12 +1650,12 @@ HEWA SERVICE වේත ඉතාමත් සාදරයෙන් පිළි�
             try { await socket.sendMessage(sender, { react: { text: '🍬', key: msg.key } }); } catch (_) {}
 
             const start = Date.now();
-            const sent = await socket.sendMessage(sender, { text: `*↳ ❝ [🎀 𝗦𝗛𝗔𝗡𝗔 𝗣𝗶𝗻𝗴 🎀] ¡! ❞*` });
+            const sent = await socket.sendMessage(sender, { text: `*↳ ❝ [🎀 HEWA 𝗣𝗶𝗻𝗴 🎀] ¡! ❞*` });
             const ms = Date.now() - start;
 
             await socket.sendMessage(sender, {
                 image: { url: SHANA_IMG },
-                caption: `*↳ ❝ [🎀 𝗦𝗛𝗔𝗡𝗔 𝗣𝗶𝗻𝗴 🎀] ¡! ❞*\n\n` +
+                caption: `*↳ ❝ [🎀 HEWA 𝗣𝗶𝗻𝗴 🎀] ¡! ❞*\n\n` +
                     `┏━━━━━°⌜ \`赤い糸\` ⌟°━━━━━┓\n` +
                     `┃₊❏❜ ⋮🏓 𝙿𝙾𝙽𝙶 : _pong!_\n` +
                     `┃₊❏❜ ⋮⚡ 𝚂𝙿𝙴𝙴𝙳 : ${ms}ms\n` +
@@ -1676,13 +1676,13 @@ HEWA SERVICE වේත ඉතාමත් සාදරයෙන් පිළි�
             const minutes = Math.floor((uptime % 3600) / 60);
             const seconds = Math.floor(uptime % 60);
 
-            const title = '*↳ ❝ [🎀 𝗦𝗛𝗔𝗡𝗔 𝗔𝗹𝗶𝘃𝗲 🎀] ¡! ❞*';
+            const title = '*↳ ❝ [🎀 HEWA  𝗔𝗹𝗶𝘃𝗲 🎀] ¡! ❞*';
             const content = `*⊹₊⟡⋆ ⋮ Ａｂｏｕｔ ᶻ 𝗓 𐰁 .ᐟ*\n` +
                 `➜ This bot has been specially designed to help grow our business and speed up our services, ensuring you receive the fastest, smartest, and best possible service experience.
 system 24/7 Online Support 💯.\n\n` +
                 `*⊹₊⟡⋆ ⋮ Ｄｅｐｌｏｙ ᶻ 𝗓 𐰁 .ᐟ*\n` +
                 `➜ *Website:* FUCK YOU `;
-            const footer = '> *𝐒𝐇𝐀𝐍𝐀 𝐃𝐄𝐕𝐀𝐋𝐎𝐏𝐄𝐄 ✹*';
+            const footer = '> *HEWA SERVICE✹*';
 
             await socket.sendMessage(sender, {
                 image: { url: SHANA_IMG },
@@ -1721,7 +1721,7 @@ system 24/7 Online Support 💯.\n\n` +
                     currentData.config = sessionConfig;
                     activeSockets.set(sanitizedNumber, currentData);
                 }
-                await reply(`𝘼𝙐𝙏𝙊 𝙍𝙚𝙥𝙡𝙮 𝙊𝙁𝙁  𝙎𝙐𝘾𝘾𝙀𝙎𝙎  ✅\n> SHANA Devalopee ✹`);
+                await reply(`𝘼𝙐𝙏𝙊 𝙍𝙚𝙥𝙡𝙮 𝙊𝙁𝙁  𝙎𝙐𝘾𝘾𝙀𝙎𝙎  ✅\n> HEWA SERVICE ✹`);
                 console.log(`✅ [SHANA AGENT] Auto reply OFF for ${sanitizedNumber}`);
 
             } else {
@@ -1745,7 +1745,7 @@ system 24/7 Online Support 💯.\n\n` +
                     currentData.config = sessionConfig;
                     activeSockets.set(sanitizedNumber, currentData);
                 }
-                await reply(`𝘾𝘼𝙇𝙇 𝘾𝙐𝙏 𝙊𝙉 𝙎𝙐𝘾𝘾𝙀𝙎𝙎 ✅\n> SHANA Devalopee ✹`);
+                await reply(`𝘾𝘼𝙇𝙇 𝘾𝙐𝙏 𝙊𝙉 𝙎𝙐𝘾𝘾𝙀𝙎𝙎 ✅\n> HEWA SERVICE ✹`);
                 console.log(`✅ [SHANA AGENT] Call cut ON for ${sanitizedNumber}`);
 
             } else if (action === 'off') {
@@ -1758,7 +1758,7 @@ system 24/7 Online Support 💯.\n\n` +
                     currentData.config = sessionConfig;
                     activeSockets.set(sanitizedNumber, currentData);
                 }
-                await reply(`𝘾𝘼𝙇𝙇 𝘾𝙐𝙏 𝙊𝙁𝙁 𝙎𝙐𝘾𝘾𝙀𝙎𝙎 ✅\n> SHANA Devalopee ✹`);
+                await reply(`𝘾𝘼𝙇𝙇 𝘾𝙐𝙏 𝙊𝙁𝙁 𝙎𝙐𝘾𝘾𝙀𝙎𝙎 ✅\n> HEWA SERVICE ✹`);
                 console.log(`✅ [SHANA AGENT] Call cut OFF for ${sanitizedNumber}`);
 
             } else {
@@ -1785,7 +1785,7 @@ system 24/7 Online Support 💯.\n\n` +
                     currentData.config = sessionConfig;
                     activeSockets.set(sanitizedNumber, currentData);
                 }
-                await reply(`𝙒𝙝𝙖𝙩𝙨𝙖𝙥𝙥 𝙎𝙩𝙖𝙩𝙪𝙨 𝙊𝙣 𝙎𝙐𝘾𝘾𝙀𝙎𝙎 ✅\n> SHANA Devalopee ✹`);
+                await reply(`𝙒𝙝𝙖𝙩𝙨𝙖𝙥𝙥 𝙎𝙩𝙖𝙩𝙪𝙨 𝙊𝙣 𝙎𝙐𝘾𝘾𝙀𝙎𝙎 ✅\n> HEWA SERVICE ✹`);
                 console.log(`✅ [WH STATUS] Status auto view+like ON for ${sanitizedNumber}`);
 
             } else if (action === 'off') {
@@ -1800,7 +1800,7 @@ system 24/7 Online Support 💯.\n\n` +
                     currentData.config = sessionConfig;
                     activeSockets.set(sanitizedNumber, currentData);
                 }
-                await reply(`𝙒𝙝𝙖𝙩𝙨𝙖𝙥𝙥 𝙎𝙩𝙖𝙩𝙪𝙨 𝙊𝙛𝙛  𝙎𝙐𝘾𝘾𝙀𝙎𝙎 ✅\n> SHANA Devalopee ✹`);
+                await reply(`𝙒𝙝𝙖𝙩𝙨𝙖𝙥𝙥 𝙎𝙩𝙖𝙩𝙪𝙨 𝙊𝙛𝙛  𝙎𝙐𝘾𝘾𝙀𝙎𝙎 ✅\n> HEWA SERVICE ✹`);
                 console.log(`✅ [WH STATUS] Status auto view+like OFF for ${sanitizedNumber}`);
 
             } else {
@@ -1832,7 +1832,7 @@ system 24/7 Online Support 💯.\n\n` +
                 autoSaveEnabled.set(botNumber, action === 'on');
                 if (!autoSaveCounters.has(botNumber)) autoSaveCounters.set(botNumber, 0);
 
-                await reply(`𝙒𝙝𝙖𝙩𝙨𝙖𝙥𝙥 𝘼𝙪𝙩𝙤 𝙎𝙖𝙫𝙚 ${action} 𝙎𝙪𝙘𝙘𝙚𝙨𝙨 ✅\n> SHANA Devalopee ✹`);
+                await reply(`𝙒𝙝𝙖𝙩𝙨𝙖𝙥𝙥 𝘼𝙪𝙩𝙤 𝙎𝙖𝙫𝙚 ${action} 𝙎𝙪𝙘𝙘𝙚𝙨𝙨 ✅\n> HEWA SERVICE ✹`);
                 console.log(`✅ [AUTO SAVE] ${action.toUpperCase()} for ${sanitizedNumber}`);
 
             } else {
@@ -1854,7 +1854,7 @@ system 24/7 Online Support 💯.\n\n` +
             const slDate = moment().tz('Asia/Colombo').format('YYYY-MM-DD');
             const slTimeNow = moment().tz('Asia/Colombo').format('HH:mm:ss');
 
-            const sysInfo = `*↳ ❝ [🎀 𝗦𝗛𝗔𝗡𝗔 𝗦𝘆𝘀𝘁𝗲𝗺 🎀] ¡! ❞*\n\n` +
+            const sysInfo = `*↳ ❝ [🎀 HEWA  𝗦𝘆𝘀𝘁𝗲𝗺 🎀] ¡! ❞*\n\n` +
                 `┏━━━━━°⌜ \`赤い糸\` ⌟°━━━━━┓\n` +
                 `┃ *⏱️ 𝚄𝙿𝚃𝙸𝙼𝙀:* ${uptime}\n` +
                 `┃ *📟 𝚁𝙰𝙼 𝚄𝚂𝙰𝙶𝙴:* ${ramUsage} MB / ${totalRam} GB\n` +
@@ -1863,7 +1863,7 @@ system 24/7 Online Support 💯.\n\n` +
                 `┃ *📅 𝙳𝙰𝚃𝙴:* ${slDate}\n` +
                 `┃ *⌚ 𝚃𝙸𝙼𝙴:* ${slTimeNow}\n` +
                 `┗━━━━━°⌜ \`赤い糸\` ⌟°━━━━━┛\n\n` +
-                `> *𝐒𝐇𝐀𝐍𝐀 𝐃𝐄𝐕𝐀𝐋𝐎𝐏𝐄𝐄 ✹*`;
+                `> *HEWA SERVICE ✹*`;
 
             await socket.sendMessage(sender, {
                 image: { url: SHANA_IMG },
@@ -2518,14 +2518,14 @@ system 24/7 Online Support 💯.\n\n` +
                 const admCnt = gm.participants.filter(p => p.admin).length;
                 const created = gm.creation ? new Date(gm.creation * 1000).toLocaleDateString() : 'Unknown';
                 await reply(
-                    `*↳ ❝ [🎀 𝗦𝗛𝗔𝗡𝗔 𝗚𝗜𝗻𝗳𝗼 🎀] ¡! ❞*\n\n` +
+                    `*↳ ❝ [🎀 HEWA 𝗚𝗜𝗻𝗳𝗼 🎀] ¡! ❞*\n\n` +
                     `₊❏❜ ⋮ *\`📛 𝙽𝙰𝙼𝙴 :\`* ${gm.subject}\n` +
                     `₊❏❜ ⋮ *\`🆔 𝙹𝙸𝙳 :\`* ${gm.id}\n` +
                     `₊❏❜ ⋮ *\`📝 𝙳𝙴𝚂𝙲 :\`* ${(gm.desc || 'None').slice(0, 100)}\n` +
                     `₊❏❜ ⋮ *\`👥 𝙼𝙴𝙼𝙱𝙴𝚁𝚂 :\`* ${total}\n` +
                     `₊❏❜ ⋮ *\`👑 𝙰𝙳𝙼𝙸𝙽𝚂 :\`* ${admCnt}\n` +
                     `₊❏❜ ⋮ *\`📅 𝙲𝚁𝙴𝙰𝚃𝙴𝙳 :\`* ${created}\n\n` +
-                    `> *𝐒𝐇𝐀𝐍𝐀 𝐃𝐄𝐕𝐀𝐋𝐎𝐏𝐄𝐄 ✹*`
+                    `> *HEWA SERVICE ✹*`
                 );
             } catch (e) { await reply(`groupinfo failed: ${e.message}`); }
             break;
