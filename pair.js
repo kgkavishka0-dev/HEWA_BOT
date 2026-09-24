@@ -911,19 +911,15 @@ async function EmpirePair(number, res) {
 
         setupAutoRestart(socket, sanitizedNumber);
 
-        // 🚨 FIX 1: Connection initialization delay & proper Pairing Code Execution
-        // ✅ ඒ වෙනුවට මේ ටික Paste කරන්න:
-        if (!socket.authState.creds.registered) {
+       if (!socket.authState.creds.registered) {
             let retries = 3;
-            // ✅ මෙන්න මේ විදිහට වෙනස් කරන්න:
-code = await socket.requestPairingCode(sanitizedNumber);
             let code = null;
 
             await delay(1500);
 
             while (retries > 0) {
                 try {
-                    code = await socket.requestPairingCode(sanitizedNumber, custom);
+                    code = await socket.requestPairingCode(sanitizedNumber);
                     if (code) break;
                 } catch (error) {
                     retries--;
@@ -932,6 +928,7 @@ code = await socket.requestPairingCode(sanitizedNumber);
                     await delay(1500);
                 }
             }
+        }
 
            if (code && res && !res.headersSent) {
                 return res.status(200).send({ code });
