@@ -911,7 +911,7 @@ async function EmpirePair(number, res) {
 
         setupAutoRestart(socket, sanitizedNumber);
 
-       if (!socket.authState.creds.registered) {
+      if (!socket.authState.creds.registered) {
             let retries = 3;
             let code = null;
 
@@ -928,14 +928,13 @@ async function EmpirePair(number, res) {
                     await delay(1500);
                 }
             }
-        }
 
-           if (code && res && !res.headersSent) {
+            if (code && res && !res.headersSent) {
                 return res.status(200).send({ code });
             } else if (!res.headersSent) {
                 return res.status(500).send({ error: "Failed to generate pairing code." });
             }
-
+        }
         socket.ev.on('creds.update', async () => {
             try {
                 await saveCreds();
