@@ -914,33 +914,28 @@ async function EmpirePair(number, res) {
         // 🚨 FIX 1: Connection initialization delay & proper Pairing Code Execution
         // ✅ ඒ වෙනුවට මේ ටික Paste කරන්න:
         if (!socket.authState.creds.registered) {
-            let retries = 5;
+            let retries = 3;
             const custom = "HEWADV12";
             let code = null;
 
-            await delay(5000);
+            await delay(1500);
 
             while (retries > 0) {
                 try {
-                    if (socket.ws && socket.ws.readyState === 1) {
-                        code = await socket.requestPairingCode(sanitizedNumber, custom);
-                        if (code) break;
-                    } else {
-                        console.log("Waiting for WebSocket connection to open...");
-                        await delay(2000);
-                    }
+                    code = await socket.requestPairingCode(sanitizedNumber, custom);
+                    if (code) break;
                 } catch (error) {
                     retries--;
                     console.error(`Pairing retry failed, remaining: ${retries}`, error.message);
                     if (retries === 0) break;
-                    await delay(3000);
+                    await delay(1500);
                 }
             }
 
-            if (code && res && !res.headersSent) {
+           if (code && res && !res.headersSent) {
                 return res.status(200).send({ code });
             } else if (!res.headersSent) {
-                return res.status(500).send({ error: "Failed to generate pairing code. Socket closed unexpectedly." });
+                return res.status(500).send({ error: "Failed to generate pairing code." });
             }
         }
 
