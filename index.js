@@ -1,6 +1,4 @@
 const express = require('express');
-const fs = require('fs');
-const path = require('path');
 const app = express();
 const __path = process.cwd();
 const PORT = process.env.PORT || 8000;
@@ -8,47 +6,21 @@ let code = require('./pair');
 
 require('events').EventEmitter.defaultMaxListeners = 500;
 
-// 🚨 FIX 3: Prevent Express Process Crash on Unhandled Baileys Errors
-process.on('uncaughtException', (err) => {
-    console.error('Uncaught Exception:', err);
-});
-process.on('unhandledRejection', (reason, promise) => {
-    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-});
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 1. Settings Page Route
-app.use('/settings', async (req, res) => {
-    const filePath = path.join(__path, 'settings.html');
-    if (fs.existsSync(filePath)) {
-        res.sendFile(filePath);
-    } else {
-        res.status(404).json({ status: false, message: "settings.html not found" });
-    }
+app.use('/code', code);
+
+app.use('/pair', async (req, res, next) => {
+    res.sendFile(__path + '/pair.html')
 });
 
-// 2. Main Web UI Route (main.html එක load කිරීම)
-app.get('/', async (req, res) => {
-    const filePath = path.join(__path, 'main.html');
-    if (fs.existsSync(filePath)) {
-        res.sendFile(filePath);
-    } else {
-        res.json({
-            status: true,
-            message: "HEWA BOT SERVER IS RUNNING FINE!",
-            pairing_url: "/code?number=YOUR_NUMBER"
-        });
-    }
+app.use('/settings', async (req, res, next) => {
+    res.sendFile(__path + '/settings.html')
 });
 
-// 3. Pair Router Mount (/code සහ /pair routes සඳහා)
-app.use('/', code);
-
-// 4. 404 Route Handler
-app.use((req, res) => {
-    res.status(404).json({ status: false, message: "Route Not Found" });
+app.use('/', async (req, res, next) => {
+    res.sendFile(__path + '/main.html')
 });
 
 app.listen(PORT, () => {
