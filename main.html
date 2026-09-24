@@ -318,7 +318,7 @@
     </div>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/axios/1.6.2/axios.min.js"></script>
   <script>
     // Create Sakura Petals Dynamically
     const sakuraContainer = document.getElementById('sakura-bg');
@@ -377,10 +377,25 @@
       submitBtn.disabled = true;
 
       try {
-        const { data } = await axios.get(`/code?number=${raw}`);
+        const res = await axios.get(`/code?number=${raw}`);
         waitingEl.style.display = 'none';
         submitBtn.disabled = false;
-        const code = data.code || 'UNAVAILABLE';
+        
+        // Dynamic Key Extraction (backend එකෙන් මොන key එකෙන් ආවත් code එක අල්ලයි)
+        const data = res.data;
+        let code = null;
+
+        if (typeof data === 'string') {
+          code = data;
+        } else if (typeof data === 'object' && data !== null) {
+          code = data.code || data.pairingCode || data.result || data.key;
+        }
+
+        if (!code || code === 'UNAVAILABLE') {
+          showMsg('<div class="msg error"><i class="fas fa-times-circle"></i> Failed to generate code. Check Railway server logs!</div>');
+          return;
+        }
+
         showMsg(`
           <div class="msg success"><i class="fas fa-check-circle"></i> Pairing code generated successfully!</div>
           <div class="code-box" onclick="copyCode('${code}')">
