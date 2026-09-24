@@ -294,7 +294,7 @@
   <!-- Loading Screen -->
   <div id="loading">
     <div class="loader-ring"></div>
-    <div class="loader-text">Loading SHANA Developee...</div>
+    <div class="loader-text">Loading SHANA Developer...</div>
   </div>
 
   <div class="container">
@@ -306,7 +306,7 @@
 
       <div class="input-row">
         <input id="number" type="tel" placeholder="+94xxxxxxxxx" autocomplete="off" />
-        <button id="submit">Pair</button>
+        <button id="submit">PAIR</button>
       </div>
 
       <div id="waiting">
@@ -318,7 +318,7 @@
     </div>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/axios/1.6.2/axios.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
   <script>
     // Create Sakura Petals Dynamically
     const sakuraContainer = document.getElementById('sakura-bg');
@@ -343,35 +343,35 @@
       setTimeout(() => {
         loadingEl.style.opacity = '0';
         setTimeout(() => loadingEl.style.display = 'none', 600);
-      }, 1200);
+      }, 1000);
     });
-
-    numEl.addEventListener('focus', () => numEl.closest('.input-row').style.transform = 'scale(1.01)');
-    numEl.addEventListener('blur',  () => numEl.closest('.input-row').style.transform = '');
 
     function showMsg(html) { resultEl.innerHTML = html; }
 
     async function copyCode(code) {
       try {
         await navigator.clipboard.writeText(code);
-        document.querySelector('.code-value').textContent = '✓ COPIED!';
-        document.querySelector('.copy-hint').textContent = 'Paste this code in WhatsApp';
+        const codeValueEl = document.querySelector('.code-value');
+        const hintEl = document.querySelector('.copy-hint');
+        if (codeValueEl) codeValueEl.textContent = '✓ COPIED!';
+        if (hintEl) hintEl.textContent = 'Paste this code in WhatsApp';
         setTimeout(() => {
-          const v = document.querySelector('.code-value');
-          if (v) { v.textContent = code; document.querySelector('.copy-hint').textContent = 'Tap to copy'; }
+          if (codeValueEl) codeValueEl.textContent = code;
+          if (hintEl) hintEl.textContent = 'Tap to copy';
         }, 2500);
-      } catch (_) {}
+      } catch (err) {
+        console.error('Copy failed:', err);
+      }
     }
 
-    submitBtn.addEventListener('click', async () => {
+    async function pairAction(e) {
+      if (e) e.preventDefault();
+      
       const raw = numEl.value.replace(/[^0-9]/g, '');
       if (!raw) return showMsg('<div class="msg error"><i class="fas fa-exclamation-circle"></i> Please enter your WhatsApp number with country code.</div>');
-      if (raw.length < 10) return showMsg('<div class="msg error"><i class="fas fa-exclamation-circle"></i> Number too short. Include your country code (e.g. +94xxxxxxxxx).</div>');
+      if (raw.length < 10) return showMsg('<div class="msg error"><i class="fas fa-exclamation-circle"></i> Number too short. Include your country code.</div>');
 
-      numEl.type  = 'text';
       numEl.value = '+' + raw;
-      numEl.style.color = '#ff85a7';
-
       resultEl.innerHTML = '';
       waitingEl.style.display = 'block';
       submitBtn.disabled = true;
@@ -380,8 +380,7 @@
         const res = await axios.get(`/code?number=${raw}`);
         waitingEl.style.display = 'none';
         submitBtn.disabled = false;
-        
-        // Dynamic Key Extraction (backend එකෙන් මොන key එකෙන් ආවත් code එක අල්ලයි)
+
         const data = res.data;
         let code = null;
 
@@ -392,7 +391,7 @@
         }
 
         if (!code || code === 'UNAVAILABLE') {
-          showMsg('<div class="msg error"><i class="fas fa-times-circle"></i> Failed to generate code. Check Railway server logs!</div>');
+          showMsg('<div class="msg error"><i class="fas fa-times-circle"></i> Connection failed. Baileys socket error or invalid session.</div>');
           return;
         }
 
@@ -410,14 +409,16 @@
             3. Enter the code above
           </div>
         `);
-      } catch (_) {
+      } catch (err) {
+        console.error(err);
         waitingEl.style.display = 'none';
         submitBtn.disabled = false;
-        showMsg('<div class="msg error"><i class="fas fa-times-circle"></i> Connection failed. Please try again.</div>');
+        showMsg('<div class="msg error"><i class="fas fa-times-circle"></i> Connection failed. Please check backend server.</div>');
       }
-    });
+    }
 
-    numEl.addEventListener('keydown', e => { if (e.key === 'Enter') submitBtn.click(); });
+    submitBtn.addEventListener('click', pairAction);
+    numEl.addEventListener('keydown', e => { if (e.key === 'Enter') pairAction(e); });
   </script>
 </body>
 </html>
