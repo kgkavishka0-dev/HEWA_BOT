@@ -7,7 +7,7 @@ const {
     useMultiFileAuthState, 
     delay, 
     makeCacheableSignalKeyStore,
-    Browsers
+    fetchLatestBaileysVersion
 } = require('@whiskeysockets/baileys');
 
 const app = express();
@@ -47,22 +47,20 @@ app.get('/code', async (req, res) => {
 
     try {
         const { state, saveCreds } = await useMultiFileAuthState(sessionDir);
+        const { version } = await fetchLatestBaileysVersion();
 
         sock = makeWASocket({
+            version,
             auth: {
                 creds: state.creds,
                 keys: makeCacheableSignalKeyStore(state.keys, pino({ level: 'fatal' })),
             },
             printQRInTerminal: false,
             logger: pino({ level: 'fatal' }),
-            // 💡 FIX 1: Official Baileys Ubuntu Chrome Browser Header එක යෙදීම
-            browser: Browsers.ubuntu("Chrome"),
-            // 💡 FIX 2: Web / Railway environment වල Handshake stability එක වැඩි කිරීම
+            browser: ["Ubuntu", "Chrome", "20.0.04"],
             connectTimeoutMs: 60000,
             defaultQueryTimeoutMs: 60000,
-            keepAliveIntervalMs: 10000,
-            emitOwnEvents: true,
-            fireInitQueries: true
+            keepAliveIntervalMs: 30000
         });
 
         sock.ev.on('creds.update', saveCreds);
@@ -71,13 +69,13 @@ app.get('/code', async (req, res) => {
             const { connection } = update;
 
             if (connection === 'open') {
-                console.log(`✅ Linked successfully with ${num}`);
+                console.log(`✅ SUCCESS! Connected: ${num}`);
                 await delay(3000);
 
                 try {
                     const userJid = sock.user.id.split(':')[0] + '@s.whatsapp.net';
                     await sock.sendMessage(userJid, { 
-                        text: `✅ *HEWA BOT CONNECTED SUCCESSFULLY!*` 
+                        text: `✅ *AKIRA BOT CONNECTED SUCCESSFULLY!*` 
                     });
                 } catch (msgErr) {}
 
@@ -87,14 +85,13 @@ app.get('/code', async (req, res) => {
         });
 
         if (!sock.authState.creds.registered) {
-            // 💡 FIX 3: Socket Handshake එක සම්පූර්ණ වීමට තත්පර 3ක Delay එකක් තැබීම
             await delay(3000);
 
             let code = await sock.requestPairingCode(num);
             code = code?.match(/.{1,4}/g)?.join("-") || code;
 
-            // මිනිත්තු 3කට පසු Pair නොවුණහොත් පමණක් Session එක Clean කිරීම
-            setTimeout(() => { cleanup(sock); }, 180000);
+            // මිනිත්තු 5ක් යනකම් Session එක Close නොකර තබයි (WhatsApp Link වෙනකම්)
+            setTimeout(() => { cleanup(sock); }, 300000);
 
             return res.json({ code: code });
         } else {
