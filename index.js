@@ -11,11 +11,7 @@ require('events').EventEmitter.defaultMaxListeners = 500;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 1. Pair Code API Routes (/code සහ /pair දෙකටම mount කිරීම)
-app.use('/code', code);
-app.use('/pair', code);
-
-// 2. Settings Page Route
+// 1. Settings Page Route
 app.use('/settings', async (req, res, next) => {
     const filePath = path.join(__path, 'settings.html');
     if (fs.existsSync(filePath)) {
@@ -25,11 +21,11 @@ app.use('/settings', async (req, res, next) => {
     }
 });
 
-// 3. Main Web UI Route (main.html එක load කිරීම)
-app.use('/', async (req, res, next) => {
-    // API request එකක් නම් next() එකට pass කරයි
-    if (req.path !== '/') return next();
+// 2. Pair Router Mount (Root level එකටම Mount කරන්න - මේක ගොඩක් වැදගත්)
+app.use('/', code);
 
+// 3. Main Web UI Route (main.html)
+app.get('/', async (req, res) => {
     const filePath = path.join(__path, 'main.html');
     if (fs.existsSync(filePath)) {
         res.sendFile(filePath);
