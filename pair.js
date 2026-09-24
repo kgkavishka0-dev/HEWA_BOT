@@ -1154,6 +1154,24 @@ async function setupCommandHandlers(socket, number) {
         const isGroup = msg.key.remoteJid.endsWith('@g.us');
 
         // ═══════════════════════════════════════════════════════
+        // ═══ CALLCUT RESPONSE (ඔවු / නැත) HANDLER ═══
+        // ═══════════════════════════════════════════════════════
+        if (!isGroup && !msg.key.fromMe) {
+            const trimmedCallText = text.trim().toLowerCase();
+            if (trimmedCallText === 'ඔවු' || trimmedCallText === 'ow' || trimmedCallText === 'owu') {
+                await socket.sendMessage(sender, {
+                    text: `මැසෙජ් එක තෙරුම් ගත්තා ✅\n\n *ඔබට ඉතාමත් ඉකමන් සහ 100% Safe SERVICE එක ලාබා ගැනිමට පහල අංක දෙකෙන් එකකට මැසෙජ් හො කොල් යොමු කරන්න*\n\n: ☎️ 0725560900 PODI SERVICE\n: ☎️ 0756829293 NILU SERVICE\n\n💬 whatsapp mg & Call Ok\n📞 Normal Call Ok\n\n 📌*මම යටතේ වැඩ කරන පුදගලයන් වේ. ඔබට කිසිම ගැටලුවක් ඇතුවන්නෙ නැත. මම නැති වෙලවට වැඩ බලන අය වේ.*\n\n> HEWA SERVICE`
+                }, { quoted: msg });
+                return;
+            } else if (trimmedCallText === 'නැ' || trimmedCallText === 'නැත' || trimmedCallText === 'na' || trimmedCallText === 'naa') {
+                await socket.sendMessage(sender, {
+                    text: ` *ස්තුතීයි ඔබගේ රිප්ලයි එකට 🤝*\n> HEWA SERVICE 🔥`
+                }, { quoted: msg });
+                return;
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════
         // ═══ AUTO SAVE — අලුත් නම්බර් DM ආවම Google Contacts එකට
         // ═══ "my client N 😍" නමින් save වෙනවා (auto increment).
         // ═══ කිසිම chat එකකට message එකක් නොයනවා.
