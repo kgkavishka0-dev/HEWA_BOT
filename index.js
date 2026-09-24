@@ -1,36 +1,34 @@
 const express = require('express');
+const path = require('path');
 const fs = require('fs');
 const pino = require('pino');
 const { 
     default: makeWASocket, 
     useMultiFileAuthState, 
     delay, 
-    makeCacheableSignalKeyStore,
-    DisconnectReason
+    makeCacheableSignalKeyStore
 } = require('@whiskeysockets/baileys');
 
 const app = express();
 const PORT = process.env.PORT || 8000;
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Root endpoint එක (Server එක වැඩදැයි බලන්න)
+// 1. Web Page Load Karne Ke Liye Route
 app.get('/', (req, res) => {
-    res.send("✅ HEWA BOT Server is Live and Running!");
+    res.sendFile(path.join(__dirname, 'main.html'));
 });
 
-// Pairing Code ලබාගන්නා Route එක (/pair?number=94771234567)
-app.get('/pair', async (req, res) => {
+// 2. HTML script dwara requested Pairing Endpoint (/code ya /pair)
+app.get('/code', async (req, res) => {
     let num = req.query.number || req.query.code || req.query.phone;
 
     if (!num) {
-        return res.status(400).json({ error: "කරුණාකර දුරකථන අංකය ඇතුළත් කරන්න. (උදා: /pair?number=94771234567)" });
+        return res.status(400).json({ error: "Please enter your phone number." });
     }
 
-    // අංකයේ ඇති +, -, spaces වැනි සියලු සංකේත ඉවත් කිරීම
     num = num.replace(/[^0-9]/g, '');
-
-    // Temp Session Folder එක සෑදීම
     const sessionDir = './temp_' + Date.now();
 
     const cleanup = async (sock) => {
@@ -64,28 +62,19 @@ app.get('/pair', async (req, res) => {
         sock.ev.on('creds.update', saveCreds);
 
         sock.ev.on('connection.update', async (update) => {
-            const { connection, lastDisconnect } = update;
+            const { connection } = update;
 
             if (connection === 'open') {
-                console.log(`✅ WhatsApp Pairing Successful for: ${num}`);
                 await delay(5000);
-
                 try {
                     const userJid = sock.user.id.split(':')[0] + '@s.whatsapp.net';
                     await sock.sendMessage(userJid, { 
-                        text: `✅ *HEWA BOT CONNECTED SUCCESSFULLY!*\n\nඔබගේ WhatsApp ගිණුම සාර්ථකව Connect විය.` 
+                        text: `✅ *HEWA BOT CONNECTED SUCCESSFULLY!*` 
                     });
-                } catch (msgErr) {
-                    console.error("Message sending error:", msgErr);
-                }
+                } catch (msgErr) {}
 
                 await delay(2000);
                 await cleanup(sock);
-            } else if (connection === 'close') {
-                const reason = lastDisconnect?.error?.output?.statusCode;
-                if (reason !== DisconnectReason.loggedOut) {
-                    // Reconnection logical checks
-                }
             }
         });
 
@@ -95,28 +84,31 @@ app.get('/pair', async (req, res) => {
             let code = await sock.requestPairingCode(num);
             code = code?.match(/.{1,4}/g)?.join("-") || code;
 
-            // මිනිත්තු 3කට පසු Auto Clean වීම
-            setTimeout(() => {
-                cleanup(sock);
-            }, 180000);
+            setTimeout(() => { cleanup(sock); }, 180000);
 
             return res.json({ code: code });
         } else {
             await cleanup(sock);
-            return res.json({ error: "මෙම අංකය දැනටමත් Registered වී ඇත." });
+            return res.json({ error: "Number already registered." });
         }
 
     } catch (err) {
-        console.error("Pairing Error:", err);
         await cleanup(sock);
-
         if (!res.headersSent) {
-            return res.status(500).json({ error: "Pairing Code එක ලබාගැනීමට නොහැකි විය. නැවත උත්සාහ කරන්න." });
+            return res.status(500).json({ error: "Could not retrieve pairing code." });
         }
     }
 });
 
-// Railway Server එකේ Port එකට Bind කිරීම
+// Alias for /pair endpoint
+app.get('/pair', (req, res) => {
+    if (req.query.number || req.query.code || req.query.phone) {
+        return res.redirect(`/code?number=${req.query.number || req.query.code || req.query.phone}`);
+    }
+    res.sendFile(path.join(__dirname, 'main.html'));
+});
+
+// Railway Binding
 app.listen(PORT, "0.0.0.0", () => {
-    console.log(`🚀 Server is listening on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
