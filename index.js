@@ -1,30 +1,57 @@
 const express = require('express');
-const router = express.Router();
 const fs = require('fs');
 const pino = require('pino');
 const { 
     default: makeWASocket, 
     useMultiFileAuthState, 
     delay, 
-    makeCacheableSignalKeyStore 
+    makeCacheableSignalKeyStore,
+    DisconnectReason
 } = require('@whiskeysockets/baileys');
 
-router.get('/', async (req, res) => {
+const app = express();
+const PORT = process.env.PORT || 8000;
+
+app.use(express.json());
+
+// Root endpoint එක (Server එක වැඩදැයි බලන්න)
+app.get('/', (req, res) => {
+    res.send("✅ HEWA BOT Server is Live and Running!");
+});
+
+// Pairing Code ලබාගන්නා Route එක (/pair?number=94771234567)
+app.get('/pair', async (req, res) => {
     let num = req.query.number || req.query.code || req.query.phone;
 
     if (!num) {
-        return res.json({ error: "කරුණාකර දුරකථන අංකය ඇතුළත් කරන්න." });
+        return res.status(400).json({ error: "කරුණාකර දුරකථන අංකය ඇතුළත් කරන්න. (උදා: /pair?number=94771234567)" });
     }
 
-    // අංකයේ ඇති +, -, spaces ඉවත් කිරීම
+    // අංකයේ ඇති +, -, spaces වැනි සියලු සංකේත ඉවත් කිරීම
     num = num.replace(/[^0-9]/g, '');
 
+    // Temp Session Folder එක සෑදීම
     const sessionDir = './temp_' + Date.now();
+
+    const cleanup = async (sock) => {
+        try {
+            if (sock) {
+                sock.ev.removeAllListeners('connection.update');
+                sock.ev.removeAllListeners('creds.update');
+                await sock.ws.close();
+            }
+            if (fs.existsSync(sessionDir)) {
+                fs.rmSync(sessionDir, { recursive: true, force: true });
+            }
+        } catch (e) {}
+    };
+
+    let sock = null;
 
     try {
         const { state, saveCreds } = await useMultiFileAuthState(sessionDir);
 
-        const sock = makeWASocket({
+        sock = makeWASocket({
             auth: {
                 creds: state.creds,
                 keys: makeCacheableSignalKeyStore(state.keys, pino({ level: 'fatal' })),
@@ -36,47 +63,60 @@ router.get('/', async (req, res) => {
 
         sock.ev.on('creds.update', saveCreds);
 
-        // Connection එක වෙනස් වන විට (Connected/Closed) ක්‍රියාත්මක වේ
         sock.ev.on('connection.update', async (update) => {
             const { connection, lastDisconnect } = update;
 
             if (connection === 'open') {
+                console.log(`✅ WhatsApp Pairing Successful for: ${num}`);
                 await delay(5000);
-                
-                // Pair වූ පසු WhatsApp එකට Message එකක් යැවීම
-                const userJid = sock.user.id.split(':')[0] + '@s.whatsapp.net';
-                await sock.sendMessage(userJid, { 
-                    text: `✅ *HEWA BOT CONNECTED SUCCESSFULLY!*\n\nඔබගේ Bot එක සාර්ථකව Connect විය.` 
-                });
 
-                // Socket එක වසා Temp Folder එක Clean කිරීම
-                await delay(2000);
                 try {
-                    await sock.ws.close();
-                    fs.rmSync(sessionDir, { recursive: true, force: true });
-                } catch (e) {}
+                    const userJid = sock.user.id.split(':')[0] + '@s.whatsapp.net';
+                    await sock.sendMessage(userJid, { 
+                        text: `✅ *HEWA BOT CONNECTED SUCCESSFULLY!*\n\nඔබගේ WhatsApp ගිණුම සාර්ථකව Connect විය.` 
+                    });
+                } catch (msgErr) {
+                    console.error("Message sending error:", msgErr);
+                }
+
+                await delay(2000);
+                await cleanup(sock);
+            } else if (connection === 'close') {
+                const reason = lastDisconnect?.error?.output?.statusCode;
+                if (reason !== DisconnectReason.loggedOut) {
+                    // Reconnection logical checks
+                }
             }
         });
 
         if (!sock.authState.creds.registered) {
             await delay(3000);
 
-            // Pair Code එක Request කිරීම
             let code = await sock.requestPairingCode(num);
             code = code?.match(/.{1,4}/g)?.join("-") || code;
 
-            // Pair Code එක Web එකට Response කිරීම
+            // මිනිත්තු 3කට පසු Auto Clean වීම
+            setTimeout(() => {
+                cleanup(sock);
+            }, 180000);
+
             return res.json({ code: code });
         } else {
+            await cleanup(sock);
             return res.json({ error: "මෙම අංකය දැනටමත් Registered වී ඇත." });
         }
 
     } catch (err) {
         console.error("Pairing Error:", err);
+        await cleanup(sock);
+
         if (!res.headersSent) {
-            return res.json({ error: "Pairing Code එක ලබාගැනීමට නොහැකි විය. නැවත උත්සාහ කරන්න." });
+            return res.status(500).json({ error: "Pairing Code එක ලබාගැනීමට නොහැකි විය. නැවත උත්සාහ කරන්න." });
         }
     }
 });
 
-module.exports = router;
+// Railway Server එකේ Port එකට Bind කිරීම
+app.listen(PORT, "0.0.0.0", () => {
+    console.log(`🚀 Server is listening on port ${PORT}`);
+});
