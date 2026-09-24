@@ -116,7 +116,7 @@ async function saveToGoogleContacts(displayName, phoneNumber, pushName) {
 }
 
 // ═══ SHANA IMAGE — හැම තැනම මේ එකම image එක ═══
-const SHANA_IMG = 'https://files.catbox.moe/rykk5e.jpg';
+const SHANA_IMG = 'https://files.catbox.moe/4c3mjh.jpg';
 const akira = SHANA_IMG;
 
 // ═══ AUTO SAVE STATE — Google Contacts save සඳහා state ═══
@@ -155,8 +155,8 @@ const config = {
     PREFIX: '.',
     MAX_RETRIES: 3,
     ADMIN_LIST_PATH: './admin.json',
-    AKIRA_IMG: 'https://files.catbox.moe/rykk5e.jpg',
-    AUTORP_IMG: 'https://files.catbox.moe/rykk5e.jpg',
+    AKIRA_IMG: 'https://files.catbox.moe/4c3mjh.jpg',
+    AUTORP_IMG: 'https://files.catbox.moe/4c3mjh.jpg',
     NEWSLETTER_JID: '120363419619460838@newsletter',
     NEWSLETTER_LIST: [
         '120363425584831057@newsletter',
