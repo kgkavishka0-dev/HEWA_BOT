@@ -1377,7 +1377,7 @@ HEWA NM
 
  ❇️Melbat
 Ambalanthota 
-#NM Ambalanthota 
+NM Ambalanthota 
 
 ❇️Lakypari
 Ambalanthota 
@@ -1394,24 +1394,15 @@ Malpeththawa
                         }, { quoted: msg });
                     }
 
-                    else if (trimmed === '4') {
-                        await socket.sendMessage(sender, {
-                            image: { url: SHANA_IMG },
-                            caption:
-`*📌ඔබත් සමග HEWA LIVE සම්බන්ද වෙන තේක් රැදී සිටින්න කරුණාර.*
+                    else if (trimmed === '4' || trimmed === '5') {
+            await socket.sendMessage(sender, {
+                image: { url: SHANA_IMG },
+                caption: `*📌 ඔබත් සමඟ HEWA LIVE සම්බන්ධ වෙන තෙක් රැඳී සිටින්න කරුණාකර.*
 
 HEWA PENDING.....
-> HEWA SERVICE 🔥`
-                        }, { quoted: msg });
-                    }
-
-                    else if (trimmed === '5') {
-                        await socket.sendMessage(sender, {
-                            image: { url: SHANA_IMG },
-                            caption:
-
-                        }, { quoted: msg });
-                    }
+> HEWA SERVICE 🪵`
+            }, { quoted: msg });
+        }
 
                     await socket.sendPresenceUpdate('paused', sender);
                     console.log(`✅ [SHANA AGENT] Number reply (${trimmed}) sent to ${sender}`);
