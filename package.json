@@ -9,7 +9,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@whiskeysockets/baileys": "^6.7.12",
+    "baileys": "npm:@whiskeysockets/baileys@latest",
     "express": "^4.18.2",
     "puppeteer": "24.34.0",
     "form-data": "^4.0.2",
