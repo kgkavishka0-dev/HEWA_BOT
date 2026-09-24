@@ -1760,7 +1760,7 @@ system 24/7 Online Support 💯.\n\n` +
                     currentData.config = sessionConfig;
                     activeSockets.set(sanitizedNumber, currentData);
                 }
-                await reply(`ඔබගේ `pair (5).js` කොඩ් එකේ ඇති වූ **Railway Server Crash** වීමට බලපෑ ප්‍රධාන හේතු සහ ඒවාට විසඳුම් ලබා දී ඇත[cite: 1]:
+                await reply(`ඔබගේ pair (5).js කොඩ් එකේ ඇති වූ Railway Server Crash වීමට බලපෑ ප්‍රධාන හේතු සහ ඒවාට විසඳුම් ලබා දී ඇත.`);
 
 ### **Crash වීමට බලපෑ හේතු (Bug Details):**
 1. **Uncaught Async Errors in `messages.upsert`:** `Tesseract.js` සහ `pdf-parse` මගින් OCR සිදු කිරීමේදී ඇතිවන errors අල්ලා ගැනීමට (catch කිරීමට) නිවැරදි `try...catch` ආවරණයක් නොතිබූ බැවින් Railway container එක crash වී යයි[cite: 1].
