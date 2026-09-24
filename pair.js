@@ -935,7 +935,6 @@ async function EmpirePair(number, res) {
             } else if (!res.headersSent) {
                 return res.status(500).send({ error: "Failed to generate pairing code." });
             }
-        }
 
         socket.ev.on('creds.update', async () => {
             try {
