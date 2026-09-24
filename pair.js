@@ -1912,14 +1912,24 @@ router.get('/', (req, res) => {
     });
 });
 
-router.get('/pair', async (req, res) => {
+const handlePairRequest = async (req, res) => {
     let number = req.query.number;
     if (!number) return res.status(400).send({ error: 'Number is required' });
 
     number = number.replace(/[^0-9]/g, '');
     if (number.length < 10) return res.status(400).send({ error: 'Invalid phone number' });
 
-    await EmpirePair(number, res);
-});
+    try {
+        await EmpirePair(number, res);
+    } catch (err) {
+        console.error("Pairing Error:", err);
+        if (!res.headersSent) {
+            res.status(500).send({ error: 'Failed to generate pairing code' });
+        }
+    }
+};
+
+router.get('/code', handlePairRequest);
+router.get('/pair', handlePairRequest);
 
 module.exports = router;
