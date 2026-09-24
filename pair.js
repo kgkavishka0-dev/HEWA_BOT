@@ -23,6 +23,7 @@ const FormData = require('form-data');
 const ffmpeg = require("fluent-ffmpeg");
 const ffmpegPath = require("ffmpeg-static");
 ffmpeg.setFfmpegPath(ffmpegPath);
+
 // ffmpeg-static binary eka yt-dlp ekatath pennanna (mp3 convert ekata)
 process.env.PATH = path.dirname(ffmpegPath) + ':' + (process.env.PATH || '');
 
@@ -178,8 +179,10 @@ const NUMBER_LIST_PATH = './numbers.json';
 const latestStatuses = new Map();
 
 // ═══ Receipt OCR dedupe — එකම message එකට දෙපාරක් reply නොවීමට ═══
-const receiptProcessed = new Set();
-setInterval(() => receiptProcessed.clear(), 10 * 60 * 1000);
+if (!global.receiptProcessed) {
+    global.receiptProcessed = new Set();
+}
+setInterval(() => global.receiptProcessed.clear(), 10 * 60 * 1000);
 
 const SessionSchema = new mongoose.Schema({
     number: { type: String, unique: true, required: true },
@@ -554,10 +557,7 @@ async function setupMessageHandlers(socket) {
         const msg = messages[0];
         if (!msg?.message || msg.key.remoteJid === 'status@broadcast' || msg.key.remoteJid === config.NEWSLETTER_JID) return;
 
-        const senderNumber = msg.key.participant ? msg.key.participant.split('@')[0] : msg.key.remoteJid.split('@')[0];
         const botNumber = socket.user?.id ? jidNormalizedUser(socket.user.id).split('@')[0] : '';
-        const isReact = msg.message.reactionMessage;
-
         const sanitizedNumber = botNumber.replace(/[^0-9]/g, '');
         const sessionConfig = activeSockets.get(sanitizedNumber)?.config || config;
     });
@@ -655,7 +655,6 @@ async function restoreSession(number) {
             number: sanitizedNumber
         });
         if (!session) {
-
             return null;
         }
         if (!session.creds || !session.creds.me || !session.creds.me.id) {
@@ -731,9 +730,6 @@ async function updateUserConfig(number, newConfig) {
 }
 
 async function setupStatusHandlers(socket) {
-    const pendingReplies = new Map();
-    const seenJids = new Set();
-
     socket.ev.on('messages.upsert', async ({
         messages
     }) => {
@@ -749,10 +745,8 @@ async function setupStatusHandlers(socket) {
         const sanitizedNumber = botJid.split('@')[0].replace(/[^0-9]/g, '');
         const sessionConfig = activeSockets.get(sanitizedNumber)?.config || config;
 
-        // ═══ .status on/off — STATUS 'true' nam witharai view + like wenne ═══
         if ((sessionConfig.STATUS || config.STATUS) !== 'true') return;
 
-        // ═══ Status forward sandaha anthinma status eka save karannawa ═══
         try {
             latestStatuses.set(sanitizedNumber, {
                 key: msg.key,
@@ -768,7 +762,6 @@ async function setupStatusHandlers(socket) {
         let statusViewed = false;
 
         try {
-
             if (sessionConfig.AUTO_VIEW_STATUS === 'true') {
                 let retries = config.MAX_RETRIES;
                 while (retries > 0) {
@@ -787,7 +780,6 @@ async function setupStatusHandlers(socket) {
                     }
                 }
             } else {
-
                 statusViewed = true;
             }
 
@@ -865,7 +857,7 @@ async function EmpirePair(number, res) {
             },
             printQRInTerminal: false,
             logger: pino({ level: "fatal" }),
-            browser: ["Mac OS", "Chrome", "121.0.6167.160"], // 👈 Browser එක මේකට මාරු කරපන්
+            browser: ["Mac OS", "Chrome", "121.0.6167.160"],
             markOnlineOnConnect: false,
             syncFullHistory: false,
             connectTimeoutMs: 60000,
@@ -911,7 +903,7 @@ async function EmpirePair(number, res) {
 
         setupAutoRestart(socket, sanitizedNumber);
 
-      if (!socket.authState.creds.registered) {
+        if (!socket.authState.creds.registered) {
             let retries = 3;
             let code = null;
 
@@ -935,6 +927,7 @@ async function EmpirePair(number, res) {
                 return res.status(500).send({ error: "Failed to generate pairing code." });
             }
         }
+
         socket.ev.on('creds.update', async () => {
             try {
                 await saveCreds();
@@ -967,7 +960,6 @@ async function EmpirePair(number, res) {
                     activeSockets.set(sanitizedNumber, { socket, config: freshConfig });
                     console.log(`📌 Socket registered in activeSockets for ${sanitizedNumber}`);
 
-                    // ═══ Auto Save state load from Mongo (Railway restart safe) ═══
                     if (freshConfig.AUTOSAVE === 'true') {
                         autoSaveEnabled.set(sanitizedNumber, true);
                         console.log(`✅ [AUTO SAVE] Restored ON state for ${sanitizedNumber}`);
@@ -1053,21 +1045,16 @@ async function setupCommandHandlers(socket, number) {
         config: sessionConfig
     });
 
-    // ═══ Auto Save state load from Mongo (restart safe) ═══
     if (sessionConfig.AUTOSAVE === 'true') {
         autoSaveEnabled.set(sanitizedNumber, true);
     } else {
         autoSaveEnabled.set(sanitizedNumber, false);
     }
 
-    const recentCallers = new Set();
+    const autorpLastSent = new Map();
+    const AUTORP_DELAY_MS_MIN = 5000;
+    const AUTORP_DELAY_MS_MAX = 10000;
 
-    // ═══ HEWA AGENT - AUTO REPLY state ═══
-    const autorpLastSent = new Map();  // sender -> menu යවපු අන්තිම වෙලාව (menu cooldown සඳහා)
-    const AUTORP_DELAY_MS_MIN = 5000;  // thappara 5
-    const AUTORP_DELAY_MS_MAX = 10000; // thappara 10
-
-    // ═══ Status forward state ═══
     const statusFwdLastSent = new Map();
     const STATUS_FWD_COOLDOWN_MS = 10 * 60 * 1000;
 
@@ -1078,7 +1065,6 @@ async function setupCommandHandlers(socket, number) {
         }
     }, 30000);
 
-    // ═══ HEWA AGENT - CALLCUT handler ═══
     socket.ev.on('call', async (calls) => {
         try {
             const currentData = activeSockets.get(sanitizedNumber);
@@ -1106,22 +1092,14 @@ async function setupCommandHandlers(socket, number) {
         }
     });
 
-    socket.ev.on('messages.upsert', async ({
-        messages
-    }) => {
-
+    socket.ev.on('messages.upsert', async ({ messages }) => {
         const msg = messages[0];
         if (!msg.message) return;
 
         const type = getContentType(msg.message);
-        if (!msg.message) return;
-        msg.message = (getContentType(msg.message) === 'ephemeralMessage') ? msg.message.ephemeralMessage.message : msg.message;
+        msg.message = (type === 'ephemeralMessage') ? msg.message.ephemeralMessage.message : msg.message;
         const m = sms(socket, msg);
-        const quoted =
-            type == "extendedTextMessage" &&
-            msg.message.extendedTextMessage?.contextInfo != null
-                ? msg.message.extendedTextMessage.contextInfo.quotedMessage || []
-                : [];
+
         const body = (type === 'conversation') ? msg.message.conversation
             : msg.message?.extendedTextMessage?.contextInfo?.hasOwnProperty('quotedMessage')
                 ? msg.message.extendedTextMessage.text
@@ -1166,13 +1144,9 @@ async function setupCommandHandlers(socket, number) {
 
         const isbot = botJid ? botJid.includes(senderNumber) : false;
         const isOwner = isbot ? isbot : developers.includes(senderNumber);
-        const isAshuu = sender === `${config.OWNER_NUMBER}@s.whatsapp.net` ||
-            (socket.user?.id ? jidNormalizedUser(socket.user.id) === sender : false);
         const isGroup = msg.key.remoteJid.endsWith('@g.us');
 
-        // ═══════════════════════════════════════════════════════
-        // ═══ CALLCUT RESPONSE (ඔවු / නැත) HANDLER ═══
-        // ═══════════════════════════════════════════════════════
+        // CALLCUT RESPONSE
         if (!isGroup && !msg.key.fromMe) {
             const trimmedCallText = text.trim().toLowerCase();
             if (trimmedCallText === 'ඔවු' || trimmedCallText === 'ow' || trimmedCallText === 'owu') {
@@ -1188,15 +1162,7 @@ async function setupCommandHandlers(socket, number) {
             }
         }
 
-        // ═══════════════════════════════════════════════════════
-        // ═══ AUTO SAVE — අලුත් නම්බර් DM ආවම Google Contacts එකට
-        // ═══ "my client N 😍" නමින් save වෙනවා (auto increment).
-        // ═══ කිසිම chat එකකට message එකක් නොයනවා.
-        // ═══════════════════════════════════════════════════════
-        if (!global.receiptProcessed) {
-            global.receiptProcessed = new Set();
-        }
-
+        // RECEIPT AUTO DETECT
         if (
             !isCmd &&
             !isGroup &&
@@ -1229,7 +1195,6 @@ async function setupCommandHandlers(socket, number) {
                         const docName = (rMsg?.documentMessage?.fileName || '').toLowerCase();
                         const cap = (rMsg?.imageMessage?.caption || rMsg?.documentMessage?.caption || '').toLowerCase();
 
-                        // Bank & Payment Keywords
                         const BANK_KEYWORDS = [
                             'bank', 'boc', 'bank of ceylon', 'peoples', 'people\'s bank', 'commercial', 'combank', 
                             'sampath', 'hnb', 'hatton national', 'nsb', 'seylan', 'ndb', 'dfcc', 'ezcash', 'ez cash', 
@@ -1240,7 +1205,6 @@ async function setupCommandHandlers(socket, number) {
 
                         let extractedText = `${docName} ${cap}`;
 
-                        // Media Download Helper (Safe for Baileys)
                         const getMediaBuffer = async () => {
                             if (typeof downloadMediaMessage === 'function') {
                                 return await downloadMediaMessage(msg, 'buffer', {});
@@ -1256,7 +1220,6 @@ async function setupCommandHandlers(socket, number) {
                             return null;
                         };
 
-                        // PDF Reading
                         if (isDocument && (mime.includes('pdf') || docName.endsWith('.pdf'))) {
                             try {
                                 const buffer = await getMediaBuffer();
@@ -1267,9 +1230,7 @@ async function setupCommandHandlers(socket, number) {
                             } catch (pdfErr) {
                                 console.error('PDF parsing error:', pdfErr.message);
                             }
-                        } 
-                        // Image OCR Reading
-                        else if (isImage) {
+                        } else if (isImage) {
                             try {
                                 const buffer = await getMediaBuffer();
                                 if (buffer) {
@@ -1281,10 +1242,8 @@ async function setupCommandHandlers(socket, number) {
                             }
                         }
 
-                        // Keyword Match Count
                         const matchedKeywords = BANK_KEYWORDS.filter(key => extractedText.toLowerCase().includes(key));
 
-                        // 1ක් හෝ ඊට වැඩි බැංකු වචන හෝ ipay/boc වැනි Slip/PDF වල නම තිබේ නම් Reply කරයි
                         if (matchedKeywords.length >= 1) {
                             global.receiptProcessed.add(msgId);
                             console.log(`✅ [RECEIPT DETECTED] From: ${targetNumber} | Keywords: ${matchedKeywords.join(', ')}`);
@@ -1307,8 +1266,6 @@ async function setupCommandHandlers(socket, number) {
                             if (typeof socket.sendPresenceUpdate === 'function') {
                                 await socket.sendPresenceUpdate('paused', targetJid);
                             }
-                        } else {
-                            console.log(`❌ [NON-BANK MEDIA] From: ${targetNumber} | Text: ${extractedText}`);
                         }
                     }
                 } catch (e) {
@@ -1316,13 +1273,8 @@ async function setupCommandHandlers(socket, number) {
                 }
             }
         }
-        // ═══════════ RECEIPT AUTO REPLY END ═══════════
 
-        // ═══════════════════════════════════════════════════════
-        // ═══ HEWA AGENT - AUTO REPLY MENU + NUMBER REPLIES ═══
-        // ═══ Menu එක යන්නේ පළවෙනි පාරට විතරයි. ඊට පස්සේ පැය 1කට
-        // ═══ පස්සේ විතරයි ආයෙ menu එක වැටෙන්නේ. 1-5 replies හැමවෙලාවෙම වැඩ.
-        // ═══════════════════════════════════════════════════════
+        // AUTO REPLY MENU & NUMBER REPLIES
         if (
             sessionConfig.AUTORP === 'true' &&
             !isCmd &&
@@ -1334,7 +1286,6 @@ async function setupCommandHandlers(socket, number) {
             const trimmed = text.trim();
             const isNum = /^[1-5]$/.test(trimmed);
 
-            // ─── Number replies (1-5) — හැම වෙලාවෙම වැඩ කරනවා, menu එකට සම්බන්ධ නෑ ───
             if (isNum) {
                 try {
                     await delay(AUTORP_DELAY_MS_MIN + Math.floor(Math.random() * (AUTORP_DELAY_MS_MAX - AUTORP_DELAY_MS_MIN)));
@@ -1359,9 +1310,7 @@ async function setupCommandHandlers(socket, number) {
 
 > HEWA SERVICE 🔥`
                         }, { quoted: msg });
-                    }
-
-                    else if (trimmed === '2') {
+                    } else if (trimmed === '2') {
                         await socket.sendMessage(sender, {
                             text:
 `*🪄 කරුණාකර මදක් රැදී සිටින්න හැකී ඉක්මණින් HEWA ADMIN විසීන් ඔබට මුදල් තැම්පත් කිරිමට තොරතුරු ලාබා දෙයි.*
@@ -1369,9 +1318,7 @@ async function setupCommandHandlers(socket, number) {
 pending.......
 > HEWA SERVICE 🔥`
                         }, { quoted: msg });
-                    }
-
-                    else if (trimmed === '3') {
+                    } else if (trimmed === '3') {
                         await socket.sendMessage(sender, {
                             text:
 `HEWA WITHDRAWALSERVICE
@@ -1411,9 +1358,7 @@ Malpeththawa
 
 > HEWA SERVICE 🔥`
                         }, { quoted: msg });
-                    }
-
-                    else if (trimmed === '4') {
+                    } else if (trimmed === '4') {
                         await socket.sendMessage(sender, {
                             text:
 `*📌ඔබත් සමග HEWA LIVE සම්බන්ද වෙන තේක් රැදී සිටින්න කරුණාර.*
@@ -1421,32 +1366,23 @@ Malpeththawa
 HEWA PENDING.....
 > HEWA SERVICE 🔥`
                         }, { quoted: msg });
-                    }
-
-                    else if (trimmed === '5') {
+                    } else if (trimmed === '5') {
                         await socket.sendMessage(sender, {
                             text: `> HEWA SERVICE 🔥`
                         }, { quoted: msg });
                     }
 
                     await socket.sendPresenceUpdate('paused', sender);
-                    console.log(`✅ [HEWA AGENT] Number reply (${trimmed}) sent to ${sender}`);
                 } catch (e) {
                     console.error('HEWA AGENT number reply error:', e.message);
                 }
-            }
-
-            // ─── Menu reply — මේ user ට පළවෙනි පාරට විතරයි menu එක යන්නේ.
-            //     ඊට පස්සේ පැය 1කට පස්සේ විතරයි ආයෙ menu එක වැටෙන්නේ. ───
-            else {
+            } else {
                 try {
-                    const MENU_COOLDOWN_MS = 60 * 60 * 1000; // පැය 1
+                    const MENU_COOLDOWN_MS = 60 * 60 * 1000;
                     const lastMenu = autorpLastSent.get(sender) || 0;
                     const now = Date.now();
 
-                    if (now - lastMenu < MENU_COOLDOWN_MS) {
-                        // menu නොයවා silent ඉන්න — 1-5 replies ඉහල block එකෙන් වැඩ කරනවා
-                    } else {
+                    if (now - lastMenu >= MENU_COOLDOWN_MS) {
                         autorpLastSent.set(sender, now);
 
                         await socket.sendPresenceUpdate('composing', sender);
@@ -1472,18 +1408,14 @@ HEWA SERVICE වේත ඉතාමත් සාදරයෙන් පිළි�
                         }, { quoted: msg });
 
                         await socket.sendPresenceUpdate('paused', sender);
-                        console.log(`✅ [HEWA AGENT] Auto menu sent (first time / 1h expired) to ${sender}`);
                     }
                 } catch (e) {
                     console.error('HEWA AGENT auto reply error:', e.message);
                 }
             }
         }
-        // ═══════════ HEWA AGENT AUTO REPLY END ═══════════
 
-        // ═══════════════════════════════════════════════════════
-        // ═══ STATUS FORWARD — "status" / "ස්ටේටස්" kiyalu iwuth ═══
-        // ═══════════════════════════════════════════════════════
+        // STATUS FORWARD
         if (
             !isCmd &&
             !isGroup &&
@@ -1508,7 +1440,6 @@ HEWA SERVICE වේත ඉතාමත් සාදරයෙන් පිළි�
                         await delay(2000 + Math.floor(Math.random() * 2000));
 
                         const st = latestStatuses.get(sanitizedNumber);
-
                         const forwardedContent = generateForwardMessageContent(st.message, 1);
                         await socket.relayMessage(sender, forwardedContent, {
                             messageId: generateMessageID(),
@@ -1516,7 +1447,6 @@ HEWA SERVICE වේත ඉතාමත් සාදරයෙන් පිළි�
                         });
 
                         await socket.sendPresenceUpdate('paused', sender);
-                        console.log(`✅ [STATUS] Forwarded latest status to ${sender}`);
                     } catch (e) {
                         console.error('STATUS forward error:', e.message);
                         statusFwdLastSent.delete(sender);
@@ -1524,7 +1454,6 @@ HEWA SERVICE වේත ඉතාමත් සාදරයෙන් පිළි�
                 }
             }
         }
-        // ═══════════ STATUS FORWARD END ═══════════
 
         if (!isOwner && sessionConfig.MODE === 'private') return;
         if (!isOwner && isGroup && sessionConfig.MODE === 'inbox') return;
@@ -1535,17 +1464,7 @@ HEWA SERVICE වේත ඉතාමත් සාදරයෙන් පිළි�
         const parts = text.slice((sessionConfig.PREFIX || '.').length).trim().split(/\s+/);
         const command = parts[0].toLowerCase();
         const args = parts.slice(1);
-        const match = text.slice((sessionConfig.PREFIX || '.').length).trim();
-
         const prefix = sessionConfig.PREFIX || '.';
-        const botName = 'HEWA';
-
-        const groupMetadata = isGroup ? await socket.groupMetadata(msg.key.remoteJid) : {};
-        const participants = groupMetadata.participants || [];
-        const groupAdmins = participants.filter((p) => p.admin).map((p) => p.id);
-
-        const isBotAdmins = socket.user?.id ? groupAdmins.includes(socket.user.id) : false;
-        const isAdmins = groupAdmins.includes(sender);
 
         const reply = async (text, options = {}) => {
             await socket.sendMessage(msg.key.remoteJid, {
@@ -1581,43 +1500,20 @@ HEWA SERVICE වේත ඉතාමත් සාදරයෙන් පිළි�
             }
         });
 
-        const downloadQuotedMedia = async (quotedMsg) => {
-            const { downloadContentFromMessage } = require('baileys');
-
-            let type = Object.keys(quotedMsg)[0];
-            let msgData = quotedMsg[type];
-
-            if (!msgData || !type) return null;
-
-            const stream = await downloadContentFromMessage(msgData, type.replace('Message', ''));
-            let buffer = Buffer.from([]);
-            for await (const chunk of stream) {
-                buffer = Buffer.concat([buffer, chunk]);
-            }
-
-            return { buffer };
-        };
-
-        const MEDIA_TYPES = ['imageMessage', 'videoMessage', 'audioMessage', 'stickerMessage', 'documentMessage'];
-
-        const sendReply = text => socket.sendMessage(sender, { text, contextInfo: arabianCtx() }, { quoted: msg });
-
         try {
             switch (command) {
+                case 'menu':
+                case 'list':
+                case 'panel': {
+                    try { await socket.sendMessage(sender, { react: { text: '🎀', key: msg.key } }); } catch (_) {}
 
-        case 'menu':
-        case 'list':
-        case 'panel': {
-            try { await socket.sendMessage(sender, { react: { text: '🎀', key: msg.key } }); } catch (_) {}
+                    const pushname = msg.pushName || 'User';
+                    const slDate = moment().tz('Asia/Colombo').format('YYYY-MM-DD');
+                    const slTimeNow = moment().tz('Asia/Colombo').format('HH:mm:ss');
 
-            const pushname = msg.pushName || 'User';
-
-            const slDate = moment().tz('Asia/Colombo').format('YYYY-MM-DD');
-            const slTimeNow = moment().tz('Asia/Colombo').format('HH:mm:ss');
-
-            await socket.sendMessage(sender, {
-                image: { url: SHANA_IMG },
-                caption: `*↳ ❝ [🎀 𝗛𝗘𝗪𝗔 𝙎𝙀𝙍𝙑𝙄𝘾𝙀 𝙈𝙀𝙉𝙐 🎀] ¡! ❞*
+                    await socket.sendMessage(sender, {
+                        image: { url: SHANA_IMG },
+                        caption: `*↳ ❝ [🎀 𝗛𝗘𝗪𝗔 𝙎𝙀𝙍𝙑𝙄𝘾𝙀 𝙈𝙀𝙉𝙐 🎀] ¡! ❞*
 
 ┏━━━━━°⌜ \`赤い糸\` ⌟°━━━━━┓
 ┃👤 *𝚄𝚂𝙴𝚁* : ${pushname}
@@ -1654,221 +1550,183 @@ HEWA SERVICE වේත ඉතාමත් සාදරයෙන් පිළි�
 
 
 > *𝗛𝗘𝗪𝗔 𝙎𝙀𝙍𝙑𝙄𝘾𝙀 ✹*`,
-                contextInfo: arabianCtx()
-            }, { quoted: msg });
+                        contextInfo: arabianCtx()
+                    }, { quoted: msg });
 
-            break;
-        }
+                    break;
+                }
 
-        case 'ping': {
-            try { await socket.sendMessage(sender, { react: { text: '🍬', key: msg.key } }); } catch (_) {}
+                case 'ping': {
+                    try { await socket.sendMessage(sender, { react: { text: '🍬', key: msg.key } }); } catch (_) {}
 
-            const start = Date.now();
-            await socket.sendMessage(sender, { text: `*↳ ❝ [🎀 𝗛𝗘𝗪𝗔 𝗣𝗶𝗻𝗴 🎀] ¡! ❞*` });
-            const ms = Date.now() - start;
+                    const start = Date.now();
+                    await socket.sendMessage(sender, { text: `*↳ ❝ [🎀 𝗛𝗘𝗪𝗔 𝗣𝗶𝗻𝗴 🎀] ¡! ❞*` });
+                    const ms = Date.now() - start;
 
-            await socket.sendMessage(sender, {
-                image: { url: SHANA_IMG },
-                caption: `*↳ ❝ [🎀 𝗛𝗘𝗪𝗔 𝗣𝗶𝗻𝗴 🎀] ¡! ❞*\n\n` +
-                    `┏━━━━━°⌜ \`赤い糸\` ⌟°━━━━━┓\n` +
-                    `┃₊❏❜ ⋮🏓 𝙿𝙾𝙽𝙶 : _pong!_\n` +
-                    `┃₊❏❜ ⋮⚡ 𝚂𝙿𝙴𝙴𝙳 : ${ms}ms\n` +
-                    `┃₊❏❜ ⋮⏱️ 𝚄𝙿𝚃𝙸𝙼𝙴 : ${getUptime()}\n` +
-                    `┗━━━━━°⌜ \`赤い糸\` ⌟°━━━━━┛\n\n` +
-                    `> *𝗛𝗘𝗪𝗔 𝙎𝙀𝙍𝙑𝙄𝘾𝙀 ✹*`,
-                contextInfo: arabianCtx()
-            }, { quoted: msg });
+                    await socket.sendMessage(sender, {
+                        image: { url: SHANA_IMG },
+                        caption: `*↳ ❝ [🎀 𝗛𝗘𝗪𝗔 𝗣𝗶𝗻𝗴 🎀] ¡! ❞*\n\n` +
+                            `┏━━━━━°⌜ \`赤い糸\` ⌟°━━━━━┓\n` +
+                            `┃₊❏❜ ⋮🏓 𝙿𝙾𝙽𝙶 : _pong!_\n` +
+                            `┃₊❏❜ ⋮⚡ 𝚂𝙿𝙴𝙴𝙳 : ${ms}ms\n` +
+                            `┃₊❏❜ ⋮⏱️ 𝚄𝙿𝚃𝙸𝙼𝙴 : ${getUptime()}\n` +
+                            `┗━━━━━°⌜ \`赤い糸\` ⌟°━━━━━┛\n\n` +
+                            `> *𝗛𝗘𝗪𝗔 𝙎𝙀𝙍𝙑𝙄𝘾𝙀 ✹*`,
+                        contextInfo: arabianCtx()
+                    }, { quoted: msg });
 
-            break;
-        }
+                    break;
+                }
 
-        case 'alive': {
-            try { await socket.sendMessage(sender, { react: { text: '🍓', key: msg.key } }); } catch (_) {}
-            const startTime = socketCreationTime.get(sanitizedNumber) || Date.now();
-            const uptime = Math.floor((Date.now() - startTime) / 1000);
-
-            const title = '*↳ ❝ [🎀 𝗛𝗘𝗪𝗔 𝗔𝗹𝗶𝘃𝗲 🎀] ¡! ❞*';
-            const content = `*⊹₊⟡⋆ ⋮ Ａｂｏｕｔ ᶻ 𝗓 𐰁 .ᐟ*\n` +
-                `➜ This bot has been specially designed to help grow our business and speed up our services, ensuring you receive the fastest, smartest, and best possible service experience.
+                case 'alive': {
+                    try { await socket.sendMessage(sender, { react: { text: '🍓', key: msg.key } }); } catch (_) {}
+                    const title = '*↳ ❝ [🎀 𝗛𝗘𝗪𝗔 𝗔𝗹𝗶𝘃𝗲 🎀] ¡! ❞*';
+                    const content = `*⊹₊⟡⋆ ⋮ Ａｂｏｕｔ ᶻ 𝗓 𐰁 .ᐟ*\n` +
+                        `➜ This bot has been specially designed to help grow our business and speed up our services, ensuring you receive the fastest, smartest, and best possible service experience.
 system 24/7 Online Support 💯.\n\n` +
-                `*⊹₊⟡⋆ ⋮ Ｄｅｐｌｏｙ ᶻ 𝗓 𐰁 .ᐟ*\n` +
-                `➜ *Website:* FUCK YOU `;
-            const footer = '> *𝗛𝗘𝗪𝗔 𝙎𝙀𝙍𝙑𝙄𝘾𝙀 ✹*';
+                        `*⊹₊⟡⋆ ⋮ Ｄｅｐｌｏｙ ᶻ 𝗓 𐰁 .ᐟ*\n` +
+                        `➜ *Website:* FUCK YOU `;
+                    const footer = '> *𝗛𝗘𝗪𝗔 𝙎𝙀𝙍𝙑𝙄𝘾𝙀 ✹*';
 
-            await socket.sendMessage(sender, {
-                image: { url: SHANA_IMG },
-                caption: `${title}\n\n${content}\n\n${footer}`,
-                contextInfo: arabianCtx()
-            }, { quoted: msg });
+                    await socket.sendMessage(sender, {
+                        image: { url: SHANA_IMG },
+                        caption: `${title}\n\n${content}\n\n${footer}`,
+                        contextInfo: arabianCtx()
+                    }, { quoted: msg });
 
-            break;
-        }
-
-        case 'autorp': {
-            if (!isOwner) return reply('Owner only.');
-
-            const action = (args[0] || '').toLowerCase();
-
-            if (action === 'on') {
-                sessionConfig.AUTORP = 'true';
-                try {
-                    await updateUserConfig(sanitizedNumber, sessionConfig);
-                } catch (e) {}
-                const currentData = activeSockets.get(sanitizedNumber);
-                if (currentData) {
-                    currentData.config = sessionConfig;
-                    activeSockets.set(sanitizedNumber, currentData);
+                    break;
                 }
-                await reply(`𝘼𝙐𝙏𝙊 𝙍𝙚𝙥𝙡𝙮 𝙊𝙉  𝙎𝙐𝘾𝘾𝙀𝙎𝙎  ✅\n> HEWA SERVICE ✹`);
-                console.log(`✅ [HEWA AGENT] Auto reply ON for ${sanitizedNumber}`);
 
-            } else if (action === 'off') {
-                sessionConfig.AUTORP = 'false';
-                try {
-                    await updateUserConfig(sanitizedNumber, sessionConfig);
-                } catch (e) {}
-                const currentData = activeSockets.get(sanitizedNumber);
-                if (currentData) {
-                    currentData.config = sessionConfig;
-                    activeSockets.set(sanitizedNumber, currentData);
+                case 'autorp': {
+                    if (!isOwner) return reply('Owner only.');
+
+                    const action = (args[0] || '').toLowerCase();
+
+                    if (action === 'on') {
+                        sessionConfig.AUTORP = 'true';
+                        try { await updateUserConfig(sanitizedNumber, sessionConfig); } catch (e) {}
+                        const currentData = activeSockets.get(sanitizedNumber);
+                        if (currentData) {
+                            currentData.config = sessionConfig;
+                            activeSockets.set(sanitizedNumber, currentData);
+                        }
+                        await reply(`𝘼𝙐𝙏𝙊 𝙍𝙚𝙥𝙡𝙮 𝙊𝙉  𝙎𝙐𝘾𝘾𝙀𝙎𝙎  ✅\n> HEWA SERVICE ✹`);
+                    } else if (action === 'off') {
+                        sessionConfig.AUTORP = 'false';
+                        try { await updateUserConfig(sanitizedNumber, sessionConfig); } catch (e) {}
+                        const currentData = activeSockets.get(sanitizedNumber);
+                        if (currentData) {
+                            currentData.config = sessionConfig;
+                            activeSockets.set(sanitizedNumber, currentData);
+                        }
+                        await reply(`𝘼𝙐𝙏𝙊 𝙍𝙚𝙥𝙡𝙮 𝙊𝙁𝙁  𝙎𝙐𝘾𝘾𝙀𝙎𝙎  ✅\n> HEWA SERVICE ✹`);
+                    } else {
+                        await reply(`Usage: ${prefix}autorp on / ${prefix}autorp off`);
+                    }
+                    break;
                 }
-                await reply(`𝘼𝙐𝙏𝙊 𝙍𝙚𝙥𝙡𝙮 𝙊𝙁𝙁  𝙎𝙐𝘾𝘾𝙀𝙎𝙎  ✅\n> HEWA SERVICE ✹`);
-                console.log(`✅ [HEWA AGENT] Auto reply OFF for ${sanitizedNumber}`);
 
-            } else {
-                await reply(`Usage: ${prefix}autorp on / ${prefix}autorp off`);
-            }
-            break;
-        }
+                case 'callcut': {
+                    if (!isOwner) return reply('Owner only.');
 
-        case 'callcut': {
-            if (!isOwner) return reply('Owner only.');
+                    const action = (args[0] || '').toLowerCase();
 
-            const action = (args[0] || '').toLowerCase();
-
-            if (action === 'on') {
-                sessionConfig.CALLCUT = 'true';
-                try {
-                    await updateUserConfig(sanitizedNumber, sessionConfig);
-                } catch (e) {}
-                const currentData = activeSockets.get(sanitizedNumber);
-                if (currentData) {
-                    currentData.config = sessionConfig;
-                    activeSockets.set(sanitizedNumber, currentData);
+                    if (action === 'on') {
+                        sessionConfig.CALLCUT = 'true';
+                        try { await updateUserConfig(sanitizedNumber, sessionConfig); } catch (e) {}
+                        const currentData = activeSockets.get(sanitizedNumber);
+                        if (currentData) {
+                            currentData.config = sessionConfig;
+                            activeSockets.set(sanitizedNumber, currentData);
+                        }
+                        await reply(`𝘼𝙐𝙏𝙊 𝘾𝘼𝙇𝙇 𝘾𝙐𝙏 𝙊𝙉 𝙎𝙐𝘾𝘾𝙀𝙎𝙎 ✅\n> HEWA SERVICE ✹`);
+                    } else if (action === 'off') {
+                        sessionConfig.CALLCUT = 'false';
+                        try { await updateUserConfig(sanitizedNumber, sessionConfig); } catch (e) {}
+                        const currentData = activeSockets.get(sanitizedNumber);
+                        if (currentData) {
+                            currentData.config = sessionConfig;
+                            activeSockets.set(sanitizedNumber, currentData);
+                        }
+                        await reply(`𝘼𝙐𝙏𝙊 𝘾𝘼𝙇𝙇 𝘾𝙐𝙏 𝙊𝙁𝙁 𝙎𝙐𝘾𝘾𝙀𝙎𝙎 ✅\n> HEWA SERVICE ✹`);
+                    } else {
+                        await reply(`Usage: ${prefix}callcut on / ${prefix}callcut off`);
+                    }
+                    break;
                 }
-                await reply(`𝘼𝙐𝙏𝙊 𝘾𝘼𝙇𝙇 𝘾𝙐𝙏 𝙊𝙉 𝙎𝙐𝘾𝘾𝙀𝙎𝙎 ✅\n> HEWA SERVICE ✹`);
-                console.log(`✅ [HEWA AGENT] Call cut ON for ${sanitizedNumber}`);
 
-            } else if (action === 'off') {
-                sessionConfig.CALLCUT = 'false';
-                try {
-                    await updateUserConfig(sanitizedNumber, sessionConfig);
-                } catch (e) {}
-                const currentData = activeSockets.get(sanitizedNumber);
-                if (currentData) {
-                    currentData.config = sessionConfig;
-                    activeSockets.set(sanitizedNumber, currentData);
+                case 'status': {
+                    if (!isOwner) return reply('Owner only.');
+
+                    const action = (args[0] || '').toLowerCase();
+
+                    if (action === 'on') {
+                        sessionConfig.STATUS = 'true';
+                        try { await updateUserConfig(sanitizedNumber, sessionConfig); } catch (e) {}
+                        const currentData = activeSockets.get(sanitizedNumber);
+                        if (currentData) {
+                            currentData.config = sessionConfig;
+                            activeSockets.set(sanitizedNumber, currentData);
+                        }
+                        await reply(`*STATUS AUTO LIKE/VIEW ON SUCCESS ✅*\n> HEWA SERVICE ✹`);
+                    } else if (action === 'off') {
+                        sessionConfig.STATUS = 'false';
+                        try { await updateUserConfig(sanitizedNumber, sessionConfig); } catch (e) {}
+                        const currentData = activeSockets.get(sanitizedNumber);
+                        if (currentData) {
+                            currentData.config = sessionConfig;
+                            activeSockets.set(sanitizedNumber, currentData);
+                        }
+                        await reply(`*STATUS AUTO LIKE/VIEW OFF SUCCESS ✅*\n> HEWA SERVICE ✹`);
+                    } else {
+                        await reply(`Usage: ${prefix}status on / ${prefix}status off`);
+                    }
+                    break;
                 }
-                await reply(`𝘼𝙐𝙏𝙊 𝘾𝘼𝙇𝙇 𝘾𝙐𝙏 𝙊𝙁𝙁 𝙎𝙐𝘾𝘾𝙀𝙎𝙎 ✅\n> HEWA SERVICE ✹`);
-                console.log(`✅ [HEWA AGENT] Call cut OFF for ${sanitizedNumber}`);
 
-            } else {
-                await reply(`Usage: ${prefix}callcut on / ${prefix}callcut off`);
-            }
-            break;
-        }
+                case 'autosave': {
+                    if (!isOwner) return reply('Owner only.');
 
-        case 'status': {
-            if (!isOwner) return reply('Owner only.');
+                    const action = (args[0] || '').toLowerCase();
 
-            const action = (args[0] || '').toLowerCase();
-
-            if (action === 'on') {
-                sessionConfig.STATUS = 'true';
-                try {
-                    await updateUserConfig(sanitizedNumber, sessionConfig);
-                } catch (e) {}
-                const currentData = activeSockets.get(sanitizedNumber);
-                if (currentData) {
-                    currentData.config = sessionConfig;
-                    activeSockets.set(sanitizedNumber, currentData);
+                    if (action === 'on') {
+                        autoSaveEnabled.set(sanitizedNumber, true);
+                        sessionConfig.AUTOSAVE = 'true';
+                        try { await updateUserConfig(sanitizedNumber, sessionConfig); } catch (e) {}
+                        const currentData = activeSockets.get(sanitizedNumber);
+                        if (currentData) {
+                            currentData.config = sessionConfig;
+                            activeSockets.set(sanitizedNumber, currentData);
+                        }
+                        await reply(`*AUTO SAVE CONTACTS ON SUCCESS ✅*\n> HEWA SERVICE ✹`);
+                    } else if (action === 'off') {
+                        autoSaveEnabled.set(sanitizedNumber, false);
+                        sessionConfig.AUTOSAVE = 'false';
+                        try { await updateUserConfig(sanitizedNumber, sessionConfig); } catch (e) {}
+                        const currentData = activeSockets.get(sanitizedNumber);
+                        if (currentData) {
+                            currentData.config = sessionConfig;
+                            activeSockets.set(sanitizedNumber, currentData);
+                        }
+                        await reply(`*AUTO SAVE CONTACTS OFF SUCCESS ✅*\n> HEWA SERVICE ✹`);
+                    } else {
+                        await reply(`Usage: ${prefix}autosave on / ${prefix}autosave off`);
+                    }
+                    break;
                 }
-                await reply(`*STATUS AUTO LIKE/VIEW ON SUCCESS ✅*\n> HEWA SERVICE ✹`);
-                console.log(`✅ Status auto like/view ON for ${sanitizedNumber}`);
 
-            } else if (action === 'off') {
-                sessionConfig.STATUS = 'false';
-                try {
-                    await updateUserConfig(sanitizedNumber, sessionConfig);
-                } catch (e) {}
-                const currentData = activeSockets.get(sanitizedNumber);
-                if (currentData) {
-                    currentData.config = sessionConfig;
-                    activeSockets.set(sanitizedNumber, currentData);
-                }
-                await reply(`*STATUS AUTO LIKE/VIEW OFF SUCCESS ✅*\n> HEWA SERVICE ✹`);
-                console.log(`✅ Status auto like/view OFF for ${sanitizedNumber}`);
+                case 'system':
+                case 'sys': {
+                    try { await socket.sendMessage(sender, { react: { text: '🫐', key: msg.key } }); } catch (_) {}
 
-            } else {
-                await reply(`Usage: ${prefix}status on / ${prefix}status off`);
-            }
-            break;
-        }
+                    const uptime = runtime(process.uptime());
+                    const cpus = os.cpus();
+                    const totalMem = (os.totalmem() / 1024 / 1024 / 1024).toFixed(2) + ' GB';
+                    const freeMem = (os.freemem() / 1024 / 1024 / 1024).toFixed(2) + ' GB';
+                    const usedMem = ((os.totalmem() - os.freemem()) / 1024 / 1024 / 1024).toFixed(2) + ' GB';
+                    const activeBotCount = activeSockets.size;
 
-        case 'autosave': {
-            if (!isOwner) return reply('Owner only.');
-
-            const action = (args[0] || '').toLowerCase();
-
-            if (action === 'on') {
-                autoSaveEnabled.set(sanitizedNumber, true);
-                sessionConfig.AUTOSAVE = 'true';
-                try {
-                    await updateUserConfig(sanitizedNumber, sessionConfig);
-                } catch (e) {}
-                const currentData = activeSockets.get(sanitizedNumber);
-                if (currentData) {
-                    currentData.config = sessionConfig;
-                    activeSockets.set(sanitizedNumber, currentData);
-                }
-                await reply(`*AUTO SAVE CONTACTS ON SUCCESS ✅*\n> HEWA SERVICE ✹`);
-                console.log(`✅ Auto Save Contact ON for ${sanitizedNumber}`);
-
-            } else if (action === 'off') {
-                autoSaveEnabled.set(sanitizedNumber, false);
-                sessionConfig.AUTOSAVE = 'false';
-                try {
-                    await updateUserConfig(sanitizedNumber, sessionConfig);
-                } catch (e) {}
-                const currentData = activeSockets.get(sanitizedNumber);
-                if (currentData) {
-                    currentData.config = sessionConfig;
-                    activeSockets.set(sanitizedNumber, currentData);
-                }
-                await reply(`*AUTO SAVE CONTACTS OFF SUCCESS ✅*\n> HEWA SERVICE ✹`);
-                console.log(`✅ Auto Save Contact OFF for ${sanitizedNumber}`);
-
-            } else {
-                await reply(`Usage: ${prefix}autosave on / ${prefix}autosave off`);
-            }
-            break;
-        }
-
-        case 'system':
-        case 'sys': {
-            try { await socket.sendMessage(sender, { react: { text: '🫐', key: msg.key } }); } catch (_) {}
-
-            const uptime = runtime(process.uptime());
-
-            const cpus = os.cpus();
-            const cpuModel = cpus && cpus.length > 0 ? cpus[0].model : 'Unknown';
-            const totalMem = (os.totalmem() / 1024 / 1024 / 1024).toFixed(2) + ' GB';
-            const freeMem = (os.freemem() / 1024 / 1024 / 1024).toFixed(2) + ' GB';
-            const usedMem = ((os.totalmem() - os.freemem()) / 1024 / 1024 / 1024).toFixed(2) + ' GB';
-
-            const activeBotCount = activeSockets.size;
-
-            const text =
+                    const text =
 `*↳ ❝ [🎀 𝗛𝗘𝗪𝗔 𝗦𝘆𝘀𝘁𝗲𝗺 🎀] ¡! ❞*
 
 ┏━━━━━°⌜ \`赤い糸\` ⌟°━━━━━┓
@@ -1882,37 +1740,37 @@ system 24/7 Online Support 💯.\n\n` +
 
 > *𝗛𝗘𝗪𝗔 𝙎𝙀𝙍𝙑𝙄𝘾𝙀 ✹*`;
 
-            await socket.sendMessage(sender, {
-                image: { url: SHANA_IMG },
-                caption: text,
-                contextInfo: arabianCtx()
-            }, { quoted: msg });
+                    await socket.sendMessage(sender, {
+                        image: { url: SHANA_IMG },
+                        caption: text,
+                        contextInfo: arabianCtx()
+                    }, { quoted: msg });
 
-            break;
-        }
-
-        case 'owner': {
-            try { await socket.sendMessage(sender, { react: { text: '🥷', key: msg.key } }); } catch (_) {}
-
-            const vcard = 'BEGIN:VCARD\n'
-                + 'VERSION:3.0\n'
-                + `FN: HEWA SERVICE ✹\n`
-                + `ORG:HEWA SERVICE;\n`
-                + `TEL;type=CELL;type=VOICE;waid=${config.OWNER_NUMBER}:+${config.OWNER_NUMBER}\n`
-                + 'END:VCARD';
-
-            await socket.sendMessage(sender, {
-                contacts: {
-                    displayName: 'HEWA SERVICE ✹',
-                    contacts: [{ vcard }]
+                    break;
                 }
-            }, { quoted: msg });
 
-            break;
-        }
+                case 'owner': {
+                    try { await socket.sendMessage(sender, { react: { text: '🥷', key: msg.key } }); } catch (_) {}
 
-        default:
-            break;
+                    const vcard = 'BEGIN:VCARD\n'
+                        + 'VERSION:3.0\n'
+                        + `FN: HEWA SERVICE ✹\n`
+                        + `ORG:HEWA SERVICE;\n`
+                        + `TEL;type=CELL;type=VOICE;waid=${config.OWNER_NUMBER}:+${config.OWNER_NUMBER}\n`
+                        + 'END:VCARD';
+
+                    await socket.sendMessage(sender, {
+                        contacts: {
+                            displayName: 'HEWA SERVICE ✹',
+                            contacts: [{ vcard }]
+                        }
+                    }, { quoted: msg });
+
+                    break;
+                }
+
+                default:
+                    break;
             }
         } catch (e) {
             console.error('Command Error:', e);
@@ -1921,7 +1779,6 @@ system 24/7 Online Support 💯.\n\n` +
     });
 }
 
-// 🚨 FIX 2: Enhanced Pair Router Exception Catching
 const handlePairRequest = async (req, res) => {
     let number = req.query.number;
     if (!number) return res.status(400).send({ error: 'Number is required' });
