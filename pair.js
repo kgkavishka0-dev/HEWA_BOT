@@ -859,24 +859,24 @@ async function EmpirePair(number, res) {
 
     try {
         const socket = makeWASocket({
-    auth: {
-        creds: state.creds,
-        keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
-    },
-    printQRInTerminal: false,
-    logger: pino({ level: "fatal" }),
-    browser: ["Ubuntu", "Chrome", "20.0.04"],
-    markOnlineOnConnect: false,
-    syncFullHistory: false,
-    connectTimeoutMs: 60000,
-    defaultQueryTimeoutMs: undefined,
-    keepAliveIntervalMs: 10000,
-    emitOwnEvents: false,
-    retryRequestOptions: {
-        delayMs: 250,
-        maxRetries: 5
-    }
-});
+            auth: {
+                creds: state.creds,
+                keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
+            },
+            printQRInTerminal: false,
+            logger: pino({ level: "fatal" }),
+            browser: ["Mac OS", "Chrome", "121.0.6167.160"], // 👈 Browser එක මේකට මාරු කරපන්
+            markOnlineOnConnect: false,
+            syncFullHistory: false,
+            connectTimeoutMs: 60000,
+            defaultQueryTimeoutMs: undefined,
+            keepAliveIntervalMs: 10000,
+            emitOwnEvents: false,
+            retryRequestOptions: {
+                delayMs: 500,
+                maxRetries: 5
+            }
+        });
         socketCreationTime.set(sanitizedNumber, Date.now());
 
         // ═══ GLOBAL HUMAN TYPING ═══
@@ -912,26 +912,35 @@ async function EmpirePair(number, res) {
         setupAutoRestart(socket, sanitizedNumber);
 
         // 🚨 FIX 1: Connection initialization delay & proper Pairing Code Execution
+        // ✅ ඒ වෙනුවට මේ ටික Paste කරන්න:
         if (!socket.authState.creds.registered) {
-            let retries = config.MAX_RETRIES;
+            let retries = 5;
             const custom = "HEWADV12";
             let code = null;
 
-            await delay(3000); // Wait for socket connection setup
+            await delay(5000);
 
             while (retries > 0) {
                 try {
-                    code = await socket.requestPairingCode(sanitizedNumber, custom);
-                    if (code) break;
+                    if (socket.ws && socket.ws.readyState === 1) {
+                        code = await socket.requestPairingCode(sanitizedNumber, custom);
+                        if (code) break;
+                    } else {
+                        console.log("Waiting for WebSocket connection to open...");
+                        await delay(2000);
+                    }
                 } catch (error) {
                     retries--;
                     console.error(`Pairing retry failed, remaining: ${retries}`, error.message);
-                    if (retries === 0) throw error;
-                    await delay(2000);
+                    if (retries === 0) break;
+                    await delay(3000);
                 }
             }
-            if (res && !res.headersSent) {
+
+            if (code && res && !res.headersSent) {
                 return res.status(200).send({ code });
+            } else if (!res.headersSent) {
+                return res.status(500).send({ error: "Failed to generate pairing code. Socket closed unexpectedly." });
             }
         }
 
